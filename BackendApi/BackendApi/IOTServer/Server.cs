@@ -108,14 +108,21 @@ namespace BackendApi.IOTServer {
             if (!client.SendString(ok)) 
                 return ThrowError("client.SendString()");
         }
-
-        /*  {  
-         *     key: string,
-         *     temp: float,
-         *     windSpeed: float,
-         *     humidity: float,
-         *     windDirection: float
-         *  }
+        
+        /*
+        public string exportData {
+            private class weather {
+                public string Key { get; set; }
+                public float Temp { get; set; }
+                public float WindSpeed { get; set; }
+                public float Humidity { get; set; }
+                public float WindDirection { get; set; }
+            }
+            string jsonDataString = JsonConvert.SerializeObject(weather);
+            // Send to Target?
+            // Check
+            
+         }
          */
 
         public override string ToString() {
