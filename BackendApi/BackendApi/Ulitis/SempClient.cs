@@ -96,5 +96,14 @@ namespace BackendApi.Ulitis {
             }
             return false;
         }
+
+        public bool Active() => this.Active();
+
+        public void Close() {
+            try { Socket.Close(); }
+            catch (Exception) {
+                // ignored
+            }
+        }
     }
 }

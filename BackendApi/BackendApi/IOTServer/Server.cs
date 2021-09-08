@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -15,26 +16,27 @@ namespace BackendApi.IOTServer {
         private string[] AllowKeys;
         private uint PackSize;
         private TimeBase TimeBase;
-        public ref struct IOTServerProps {
-            public string? Ipv4;
-            public uint Port;
+        private IWaitPush<Point?> PushStream;
+        public struct IOTServerProps {
+            public string? Url;
+            public int Port;
             public string[]? AllowKeys;
             public int MaxClients;
             public uint PackSize;
-            public TimeBase? TimeBase;
+            public Ulitis.IWaitPush<Point?> PushStream;
         }
 
-        public IOTServer(ref IOTServerProps props) {
-            if (string.IsNullOrEmpty(props.Ipv4)) throw new Exception("props.Ipv4 is null Or Empty");
-            if (props.Ipv4 == "Any") Ipv4 = IPAddress.Any;
-            else if (!System.Net.IPAddress.TryParse(props.Ipv4, out Ipv4!)) throw new Exception("Ipv4 is not Valid");
+        public IOTServer(IOTServerProps props) {
+            if (string.IsNullOrEmpty(props.Url)) throw new Exception("props.Ipv4 is null Or Empty");
+            if (props.Url == "Any") Ipv4 = IPAddress.Any;
+            else if (!System.Net.IPAddress.TryParse(props.Url, out Ipv4!)) throw new Exception("Ipv4 is not Valid");
             
             Socket = null;
             AllowKeys = props.AllowKeys ?? Array.Empty<string>();
             Port = (int)(props.Port == 0? throw new Exception("props.Port is 0"): props.Port);
             PackSize = (props.Port == 0 ? throw new Exception("props.PackSize is 0") : props.PackSize);
             MaxClients = props.MaxClients;
-            TimeBase = props.TimeBase;
+            PushStream = props.PushStream;
         }
 
         public Task Start() => Task.Run(Run);
@@ -68,11 +70,13 @@ namespace BackendApi.IOTServer {
         }
 
         private class ReceivIOTValue {
-            public string Key { get; set; }
+            public string? Key { get; set; }
             public float Temp { get; set; }
             public float WindSpeed { get; set; }
             public float Humidity { get; set; }
             public float WindDirection { get; set; }
+
+            public Point ToPoint(long createTime) => new Point(createTime, Temp, WindSpeed, Humidity, WindDirection);
             
             public static ReceivIOTValue? Factory(string jsonString) {
                 try {
@@ -95,28 +99,42 @@ namespace BackendApi.IOTServer {
             SempClient client = arg.client;
             TimeBase timeBase = arg.objects.Length == 0 ? throw new Exception("Array Length = 0"): (TimeBase)(arg.objects[0]);
 
-            if (!client.ReceiveString(out var json)) 
-                return ThrowError("client.ReceiveString()");
+            while (client.Active()) {
+                if (!client.ReceiveString(out var json)) {
+                    this.PushStream.Push(null);
+                    return ThrowError("client.ReceiveString()");
+                }
 
-            var iotTimeData = ReceivIOTValue.Factory(json);
+                var createTime = DateTime.Now.Ticks;
+                var iotTimeData = ReceivIOTValue.Factory(json);
+                
+                if (iotTimeData is null) {
+#if DEBUG
+                    throw new NullReferenceException("iotTimeData Is Null");
+#else
+                    client.SendString(error);
+                    client.Close();
+#endif
+                }
 
-            if (iotTimeData is null) {
-                if (!client.SendString(error)) 
-                    return ThrowError("client.SendString()");    
+                if (AllowKeys.All(x => iotTimeData.Key != x)) {
+#if DEBUG
+                    throw new Exception("Key not Same");
+#else
+                    client.SendString(error);
+                    client.Close();
+#endif
+                }
+                
+                var pushTask = this.PushStream.PushAsync(new Point());
+                
+                if (!client.SendString(ok)) {
+                    pushTask.Wait();
+                    return ThrowError("client.SendString()");
+                }
+                pushTask.Wait();
             }
-            
-            if (!client.SendString(ok)) 
-                return ThrowError("client.SendString()");
         }
-
-        /*  {  
-         *     key: string,
-         *     temp: float,
-         *     windSpeed: float,
-         *     humidity: float,
-         *     windDirection: float
-         *  }
-         */
 
         public override string ToString() {
             return $"Socket Info:\n" +

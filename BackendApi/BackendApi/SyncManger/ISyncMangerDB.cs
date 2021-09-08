@@ -1,5 +1,5 @@
 namespace BackendApi {
-    public class DataBase {
+    public interface ISyncMangerDB {
         
     }
 }

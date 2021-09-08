@@ -1,25 +1,23 @@
 namespace BackendApi.Ulitis {
     public struct Point {
         internal bool Dead;
-        internal long TimeGrap;
         public long TimeReal;
-        public float Value;
+        public float Temp;
+        public float WindSpeed;
+        public float Humidity;
+        public float WindDirection;
 
-        internal Point(long timeGrap, bool dead) : this() {
+        public Point(bool dead = true) : this() {
             Dead = dead;
         }
 
-        public Point(long timeReal, float value) : this() {
-            TimeReal = timeReal;
-            Value = value;
+        public Point(long timeReal, float temp, float windSpeed, float humidity, float windDirection) : this() {
             Dead = false;
-        }
-
-        internal Point(long timeGrap, long timeReal, float value) {
-            TimeGrap = timeGrap;
             TimeReal = timeReal;
-            Value = value;
-            Dead = false;
+            Temp = temp;
+            WindSpeed = windSpeed;
+            Humidity = humidity;
+            WindDirection = windDirection;
         }
     }
 }
