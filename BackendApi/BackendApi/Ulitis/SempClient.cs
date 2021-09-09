@@ -10,17 +10,15 @@ namespace BackendApi.Ulitis {
     public class SempClient {
         private Socket Socket;
         private uint PackSize;
-        private Thread? Thread;
+        
         public SempClient(Socket socket, uint packSize) {
             Socket = socket;
             PackSize = packSize;
         }
 
-        public static Thread FactoryStart(Socket socket, uint packSize, object[] objects, Func<(SempClient client, object[] objects), bool> func) {
+        public static Task FactoryStart(Socket socket, uint packSize, Action<SempClient> action) {
             var sempClient = new SempClient(socket, packSize);
-            sempClient.Thread = new Thread(() => func((sempClient, objects)));
-            sempClient.Thread.Start();
-            return sempClient.Thread;
+            return Task.Run((() => action(sempClient)));
         }
         
         
@@ -36,9 +34,12 @@ namespace BackendApi.Ulitis {
             }
 #if DEBUG
             catch (Exception e) {
+                Console.WriteLine(e);
                 throw;
 #else
-            catch (Exception)
+            catch (Exception) {
+                fromClient = null;
+                return false;
 #endif
             }
         }
@@ -58,15 +59,15 @@ namespace BackendApi.Ulitis {
             }
 #if DEBUG
             catch (Exception e) {
+                Console.WriteLine(e);
                 throw;
 #else
-            catch (Exception)
+            catch (Exception) {
+                fromClientSpan = Span<byte>.Empty; 
+                size = -1;
+                return false;
 #endif
             }
-
-            fromClientSpan = Span<byte>.Empty; 
-            size = -1;
-            return false;
         }
 
         public bool SendString(string value) {
@@ -90,14 +91,19 @@ namespace BackendApi.Ulitis {
                 Socket.Send(toClient);
                 return true;
             }
+#if DEBUG
             catch (Exception e) {
                 Console.WriteLine(e);
                 throw;
+#else
+            catch (Exception) { 
+                return false;
+#endif
             }
-            return false;
+            
         }
 
-        public bool Active() => this.Active();
+        public bool Active() => Socket.Connected;
 
         public void Close() {
             try { Socket.Close(); }

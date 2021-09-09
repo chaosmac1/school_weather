@@ -26,7 +26,7 @@ namespace BackendApi {
             var deltaTime = new DeltaTimeSleep(_delayTimeMs); 
             while (true) {
                 _dbPoint.Push(_iOTPoint.Pop());
-                deltaTime.Sleep().Wait();
+                deltaTime.Sleep();
             }
         }
     }

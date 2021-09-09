@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace BackendApi {
@@ -8,7 +9,7 @@ namespace BackendApi {
         }
 
         private static ConfValue? _valueFromFileBuffer;
-        private static ConfValue _valueFromFile {
+        private static ConfValue ValueFromFile {
             get {
                 if (_valueFromFileBuffer is null)
                     throw new NullReferenceException("StaticConf.Init() Must be First Run");
@@ -16,8 +17,8 @@ namespace BackendApi {
             }
             set => _valueFromFileBuffer = value;
         }
-        public static string DbUrl { get => _valueFromFile.DbUrl?? throw new NullReferenceException("DbUrl"); }
-        public static string DbPasswd { get => _valueFromFile.DbPasswd?? throw new NullReferenceException("DbPasswd"); }
+        public static string DbUrl { get => ValueFromFile.DbUrl?? throw new NullReferenceException("DbUrl"); }
+        public static string DbPasswd { get => ValueFromFile.DbPasswd?? throw new NullReferenceException("DbPasswd"); }
 
         public static void Init() {
             throw new NotImplementedException("StaticConf.Init()");

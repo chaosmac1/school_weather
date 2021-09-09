@@ -9,11 +9,12 @@ namespace BackendApi.DataBase {
         }
 
         private static class CollationName {
-            public const string TimeLine5sek = "TimeLine5sek";
-            public const string TimeLine1min = "TimeLine1min";
-            public const string TimeLine1day = "TimeLine1day";
-            public const string TimeLine1h = "TimeLine1h";
-            
+            public const string TimeLine5sek = "time_line_5sek";
+            public const string TimeLine1min = "time_line_1min";
+            public const string TimeLine1day = "time_line_1day";
+            public const string TimeLine1h = "time_line_1h";
+            public const string Acc = "acc";
+
         }
 
         private static class CollationTypeOf {
@@ -82,6 +83,22 @@ namespace BackendApi.DataBase {
             try {
                 var client = GetMongoClient(url);
                 var coll = client.GetDatabase(DataBaseName.TimeLine).GetCollection<TimeLine1h>(CollationName.TimeLine1h);
+                return coll;
+            }
+#if DEBUG
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;
+            }
+#else
+            catch (Exception) { return null; }
+#endif
+        }
+
+        public static IMongoCollection<Type.Acc>? GetAcc(string url) {
+            try {
+                var client = GetMongoClient(url);
+                var coll = client.GetDatabase(DataBaseName.TimeLine).GetCollection<Type.Acc>(CollationName.Acc);
                 return coll;
             }
 #if DEBUG

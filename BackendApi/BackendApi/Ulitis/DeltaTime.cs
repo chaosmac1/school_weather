@@ -16,11 +16,10 @@ namespace BackendApi.Ulitis {
             WaitTimeMs = (int)(waitTimeTicks / TimeSpan.TicksPerMillisecond);
         }
 
-        public async Task Sleep() {
+        public void Sleep() {
             var timeNow = DateTime.Now.Ticks;
             var sleep = WaitTimeMs - (int)((timeNow - LastWait) / TimeSpan.TicksPerMillisecond);
-            await Task.Delay(sleep);
-
+            Task.Delay(sleep).Wait();
             LastWait = DateTime.Now.Ticks;
         }
     }

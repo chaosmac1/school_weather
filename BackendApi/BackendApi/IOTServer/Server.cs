@@ -15,7 +15,6 @@ namespace BackendApi.IOTServer {
         private int Port;
         private string[] AllowKeys;
         private uint PackSize;
-        private TimeBase TimeBase;
         private IWaitPush<Point?> PushStream;
         public struct IOTServerProps {
             public string? Url;
@@ -49,22 +48,10 @@ namespace BackendApi.IOTServer {
             Console.WriteLine(this.ToString());
             while (true) {
                 Socket client;
-                try {
-                    client = Socket.Accept();
-                    Console.WriteLine("Accept Client");
-
-                    SempClient.FactoryStart(client, PackSize, new[] {this.TimeBase}, ServerClientFunc);
-
-                }
-                catch (Exception e) {
-#if DEBUG
-                    throw;
-#else
-                    continue;
-#endif
-                }
-                
-                
+                client = Socket.Accept();
+                Console.WriteLine("Accept Client");
+                    
+                SempClient.FactoryStart(client, PackSize, this.ServerClientFunc);
             }
             
         }
@@ -86,7 +73,7 @@ namespace BackendApi.IOTServer {
             } 
         }
         
-        private bool ServerClientFunc((SempClient client, object[] objects) arg) {
+        private void ServerClientFunc(SempClient client) {
             static bool ThrowError(string msg) {
 #if DEBUG
                 throw new Exception(msg);
@@ -96,13 +83,11 @@ namespace BackendApi.IOTServer {
             }
             const string ok = "{error: false}";
             const string error = "{error: true}";
-            SempClient client = arg.client;
-            TimeBase timeBase = arg.objects.Length == 0 ? throw new Exception("Array Length = 0"): (TimeBase)(arg.objects[0]);
 
             while (client.Active()) {
                 if (!client.ReceiveString(out var json)) {
                     this.PushStream.Push(null);
-                    return ThrowError("client.ReceiveString()");
+                    ThrowError("client.ReceiveString()");
                 }
 
                 var createTime = DateTime.Now.Ticks;
@@ -117,7 +102,7 @@ namespace BackendApi.IOTServer {
 #endif
                 }
 
-                if (AllowKeys.All(x => iotTimeData.Key != x)) {
+                if (AllowKeys.All(x => iotTimeData!.Key != x)) {
 #if DEBUG
                     throw new Exception("Key not Same");
 #else
@@ -130,7 +115,7 @@ namespace BackendApi.IOTServer {
                 
                 if (!client.SendString(ok)) {
                     pushTask.Wait();
-                    return ThrowError("client.SendString()");
+                    ThrowError("client.SendString()");
                 }
                 pushTask.Wait();
             }
@@ -144,3 +129,30 @@ namespace BackendApi.IOTServer {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

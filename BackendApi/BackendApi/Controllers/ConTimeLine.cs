@@ -26,24 +26,57 @@ namespace BackendApi.Controllers {
                 }
             }
         }
+        public enum ETimeValue {
+            FiveSek,
+            OneMin,
+            OneH,
+            OneDay,
+        }
+        public class TsTimeLineAll {
+            public TsTimeLine? Temp { get; set; }
+            public TsTimeLine? WindSpeed { get; set; }
+            public TsTimeLine? Humidity { get; set; }
+            public TsTimeLine? WindDirection { get; set; }
+
+        }
+
+        [HttpGet("all")]
+        public TsTimeLineAll GetAll(string? startTime, string? endTime, string? timeValue) {
+            if (!string.IsNullOrEmpty(startTime)) return new TsTimeLineAll();
+            if (!string.IsNullOrEmpty(endTime)) return new TsTimeLineAll();
+            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLineAll();
+            throw new NotImplementedException("all");
+        }
         
         [HttpGet("temp")]
         public TsTimeLine GetTemp(string? startTime, string? endTime, string? timeValue) {
+            if (!string.IsNullOrEmpty(startTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(endTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
             throw new NotImplementedException("GetTemp");
         }
 
         [HttpGet("windspeed")]
         public TsTimeLine GetWindSpeed(string? startTime, string? endTime, string? timeValue) {
+            if (!string.IsNullOrEmpty(startTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(endTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
             throw new NotImplementedException("GetWindSpeed");
         }
 
         [HttpGet("humidity")]
         public TsTimeLine GetHumidity(string? startTime, string? endTime, string? timeValue) {
+            if (!string.IsNullOrEmpty(startTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(endTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
             throw new NotImplementedException("Humidity");
         }
 
         [HttpGet("windDirection")]
         public TsTimeLine GetWindDirection(string? startTime, string? endTime, string? timeValue) {
+            if (!string.IsNullOrEmpty(startTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(endTime)) return new TsTimeLine();
+            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
             throw new NotImplementedException("WindDirection");
         }
     }

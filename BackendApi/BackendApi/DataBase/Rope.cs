@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendApi.DataBase.Type;
 using BackendApi.Ulitis;
@@ -14,6 +15,7 @@ namespace BackendApi.DataBase {
         private readonly IMongoCollection<TimeLine1min> CollTimeLine1min;
         private readonly IMongoCollection<TimeLine1h> CollTimeLine1h;
         private readonly IMongoCollection<TimeLine1day> CollTimeLine1day;
+        private bool FirstValuesExist = false;
         
         public Rope(string url, string passwd, IWaitPop<Point?> popWait) {
             Url = url;
@@ -37,16 +39,58 @@ namespace BackendApi.DataBase {
                 var nextPoint = this.PopWait.Pop();
                 if (nextPoint is null) continue;
 
-                if (!FirstValueExist(out var firstValueExist)) 
-                    throw new NotImplementedException();
-
-                if (firstValueExist) {
-                    
+                if (!FirstValueExist(out FirstValuesExist)) {
+                    ThrowErr("Try To Check If First Value Exist");
+                    continue;
                 }
+
+                if (FirstValuesExist == false) {
+                    if (!InsertFirstValue(nextPoint.Value)) {
+                        ThrowErr("InsertFirstValue Insert Error");
+                        continue;    
+                    }
+                    FirstValuesExist = true;
+                }
+
+                if (!InsertPointIn5sek(nextPoint.Value)) {
+                    ThrowErr("InsertPointIn5sek Insert Error");
+                    continue;
+                }
+
+                if (!UpdateAll()) ThrowErr("UpdateAll Error");
             }
         }
 
-        private bool InsertFirstValue() {
+        private bool InsertPointIn5sek(Point point) {
+            try {
+                GetColl<TimeLine5sek>().InsertOne((TimeLine5sek)point);
+                return true;
+            }
+#if DEBUG
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;    
+            }
+#else
+            catch (Exception) { return false; }
+#endif
+        }
+        private bool InsertFirstValue(Point point) {
+            try {
+                GetColl<TimeLine5sek>().InsertOne((TimeLine5sek)point);
+                GetColl<TimeLine1min>().InsertOne((TimeLine1min)point);
+                GetColl<TimeLine1h>().InsertOne((TimeLine1h)point);
+                GetColl<TimeLine1day>().InsertOne((TimeLine1day)point);
+                return true;
+            }
+#if DEBUG
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;    
+            }
+#else
+            catch (Exception) { return false; }
+#endif
             
         }
         
@@ -85,32 +129,87 @@ namespace BackendApi.DataBase {
         }
 
         private bool GetLast<T>(out T? point) where T : TimeLineDb => GetLastFind(GetColl<T>(), out point);
-        
+
+        private bool FindAllDocsInRange<T>(long ticksStart, long ticksEnd, out T[] timeLineDbs) where T : TimeLineDb {
+            try {
+                timeLineDbs = GetColl<T>().FindSync(
+                    Builders<T>.Filter.Gte(x => x.TimeTicks, ticksStart) &
+                    Builders<T>.Filter.Lt(x => x.TimeTicks, ticksEnd)).ToList().ToArray();
+                return true;
+            }
+            catch (Exception) {
+                timeLineDbs = Array.Empty<T>();
+                return false;
+            }
+        }
+
+        /// <summary> </summary>
+        /// <param name="timeTicks"></param>
+        /// <param name="lowerTimeLine"></param>
+        /// <typeparam name="T"> Higher Time Line </typeparam>
+        /// <typeparam name="U"> Lower Time Line </typeparam>
+        /// <returns></returns>
+        private bool InsertNextValueInDb<T, U>(long timeTicks,U[] lowerTimeLine) where T : TimeLineDb, new() where U : TimeLineDb, new() {
+            try {
+                GetColl<T>().InsertOne(new T() {
+                    TimeTicks = timeTicks,
+                    Humidity = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.Humidity),
+                    Temp = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.Temp),
+                    WindDirection = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.WindDirection),
+                    WindSpeed = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.WindSpeed),
+                });
+                return true;
+            }
+#if DEBUG
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;
+            }
+#else
+            catch (Exception) { return false; }
+#endif
+        }
+
+        /// <summary>  </summary>
+        /// <param name="timeLineRange"></param>
+        /// <typeparam name="T"> Higher Time Line </typeparam>
+        /// <typeparam name="U"> Lower Time Line </typeparam>
+        /// <returns></returns>
+        private bool Update<T, U>(long timeLineRange) where T : TimeLineDb, new() where U : TimeLineDb, new() {
+            if (!GetLast<T>(out var lastTimeLine1Min)) 
+                return false;
+            
+            if (lastTimeLine1Min is null)
+                return true;
+            
+            if ((lastTimeLine1Min.TimeTicks + timeLineRange) > DateTime.Now.Ticks) 
+                return true;
+            
+            if (!FindAllDocsInRange<U>(lastTimeLine1Min.TimeTicks, lastTimeLine1Min.TimeTicks + timeLineRange, out var timeLineUs)) 
+                return false;
+            
+            return InsertNextValueInDb<T, U>(lastTimeLine1Min.TimeTicks + timeLineRange, timeLineUs);
+        }
+
+        private bool Update1min() => Update<TimeLine1min, TimeLine5sek>(TimeSpan.TicksPerMinute);
+
+        private bool Update1h() => Update<TimeLine1h, TimeLine1min>(TimeSpan.TicksPerHour);
+
+        private bool Update1day() => Update<TimeLine1day, TimeLine1h>(TimeSpan.TicksPerDay);
+
+        private bool UpdateAll() {
+            if (!Update1min()) return ThrowErr("Update1min Error");
+            if (!Update1h()) return ThrowErr("Update1h Error");
+            if (!Update1day()) return ThrowErr("Update1day Error");
+            return true;
+        }
+
         private static bool ThrowErr(string msg) {
 #if DEBUG
             throw new Exception(msg);
 #else
                 return false;
 #endif
-        }
-
-        public static bool Update1min() {
-            
-        }
-
-        public static bool Update1h() {
-            
-        }
-
-        public static bool Update1day() {
-            
-        }
-
-        public static bool UpdateAll() {
-            if (!Update1min()) return false;
-            if (!Update1h()) return false;
-            if (!Update1day()) return false;
-            return true;
         }
     }
 }

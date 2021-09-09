@@ -3,40 +3,40 @@ using System.Threading.Tasks;
 
 namespace BackendApi.Ulitis {
     public struct WaitPushPop<T> : IWaitPush<T>, IWaitPop<T> {
-        private bool _allowPush;
+        private bool _allowPop;
         private T? _value;
 
         public void Push(T value) {
-            while (!_allowPush) {
+            while (_allowPop) {
                 Task.Delay(10).Wait();
             }
 
-            _allowPush = false;
+            _allowPop = true;
             _value = value;
         }
 
         public async Task PushAsync(T value) {
-            while (!_allowPush) {
+            while (_allowPop) {
                 await Task.Delay(10);
             }
 
-            _allowPush = false;
+            _allowPop = true;
             _value = value;
         }
 
         public T? Pop() {
-            while (_allowPush) {
+            while (!_allowPop) {
                 Task.Delay(10).Wait();
             }
 
             var value = _value;
             _value = default;
-            _allowPush = true;
+            _allowPop = false;
             return value;
         }
 
-        public bool CanPush() => _allowPush;
-        public bool CanPop() => !_allowPush;
+        public bool CanPush() => !_allowPop;
+        public bool CanPop() => _allowPop;
 
         public IWaitPush<T> GetPushOnly() => this;
         public IWaitPop<T> GetPopOnly() => this;
