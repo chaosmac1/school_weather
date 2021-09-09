@@ -6,25 +6,21 @@ using BackendApi.Ulitis;
 using MongoDB.Driver;
 
 namespace BackendApi.DataBase {
-    
+
     public class Rope {
-        private readonly string Url;
-        private readonly string Passwd;
-        private readonly IWaitPop<Point?> PopWait;
-        private readonly IMongoCollection<TimeLine5sek> CollTimeLine5sek;
-        private readonly IMongoCollection<TimeLine1min> CollTimeLine1min;
-        private readonly IMongoCollection<TimeLine1h> CollTimeLine1h;
         private readonly IMongoCollection<TimeLine1day> CollTimeLine1day;
-        private bool FirstValuesExist = false;
-        
+        private readonly IMongoCollection<TimeLine1h> CollTimeLine1h;
+        private readonly IMongoCollection<TimeLine1min> CollTimeLine1min;
+        private readonly IMongoCollection<TimeLine5sek> CollTimeLine5sek;
+        private readonly IWaitPop<Point?> PopWait;
+        private bool FirstValuesExist;
+
         public Rope(string url, string passwd, IWaitPop<Point?> popWait) {
-            Url = url;
-            Passwd = passwd;
             PopWait = popWait;
-            CollTimeLine5sek = GetCol.GetTimeLine5sek(url)?? throw new NullReferenceException("Connect To MongoDb Is Null");
-            CollTimeLine1min = GetCol.GetTimeLine1min(url)?? throw new NullReferenceException("Connect To MongoDb Is Null");
-            CollTimeLine1h = GetCol.GetTimeLine1h(url)?? throw new NullReferenceException("Connect To MongoDb Is Null");
-            CollTimeLine1day = GetCol.GetTimeLine1day(url)?? throw new NullReferenceException("Connect To MongoDb Is Null");
+            CollTimeLine5sek = GetCol.GetTimeLine5sek(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
+            CollTimeLine1min = GetCol.GetTimeLine1min(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
+            CollTimeLine1h = GetCol.GetTimeLine1h(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
+            CollTimeLine1day = GetCol.GetTimeLine1day(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
         }
 
         public static (Rope Rope, Task task) FactoryStart(string url, string passwd, IWaitPop<Point?> popWait) {
@@ -32,11 +28,13 @@ namespace BackendApi.DataBase {
             return (rope, rope.Start());
         }
 
-        public Task Start() => Task.Run(LoopFunc);
+        public Task Start() {
+            return Task.Run(LoopFunc);
+        }
 
         private void LoopFunc() {
             while (true) {
-                var nextPoint = this.PopWait.Pop();
+                var nextPoint = PopWait.Pop();
                 if (nextPoint is null) continue;
 
                 if (!FirstValueExist(out FirstValuesExist)) {
@@ -47,12 +45,12 @@ namespace BackendApi.DataBase {
                 if (FirstValuesExist == false) {
                     if (!InsertFirstValue(nextPoint.Value)) {
                         ThrowErr("InsertFirstValue Insert Error");
-                        continue;    
+                        continue;
                     }
                     FirstValuesExist = true;
                 }
 
-                if (!InsertPointIn5sek(nextPoint.Value)) {
+                if (!InsertPointIn5Sek(nextPoint.Value)) {
                     ThrowErr("InsertPointIn5sek Insert Error");
                     continue;
                 }
@@ -61,7 +59,7 @@ namespace BackendApi.DataBase {
             }
         }
 
-        private bool InsertPointIn5sek(Point point) {
+        private bool InsertPointIn5Sek(Point point) {
             try {
                 GetColl<TimeLine5sek>().InsertOne((TimeLine5sek)point);
                 return true;
@@ -69,12 +67,13 @@ namespace BackendApi.DataBase {
 #if DEBUG
             catch (Exception e) {
                 Console.WriteLine(e);
-                throw;    
+                throw;
             }
 #else
             catch (Exception) { return false; }
 #endif
         }
+
         private bool InsertFirstValue(Point point) {
             try {
                 GetColl<TimeLine5sek>().InsertOne((TimeLine5sek)point);
@@ -86,20 +85,17 @@ namespace BackendApi.DataBase {
 #if DEBUG
             catch (Exception e) {
                 Console.WriteLine(e);
-                throw;    
+                throw;
             }
 #else
             catch (Exception) { return false; }
 #endif
-            
         }
-        
+
         private bool FirstValueExist(out bool exist) {
             var db = GetColl<TimeLine5sek>();
 
-            if (db.CountDocuments(Builders<TimeLine5sek>.Filter.Exists(x => x._Id)) == 0) {
-                exist = false;
-            }
+            if (db.CountDocuments(Builders<TimeLine5sek>.Filter.Exists(x => x._Id)) == 0) exist = false;
             exist = true;
             return true;
         }
@@ -107,17 +103,17 @@ namespace BackendApi.DataBase {
 
         private IMongoCollection<T> GetColl<T>() where T : TimeLineDb {
             var want = typeof(T);
-            if (want == typeof(TimeLine5sek)) return (IMongoCollection<T>) CollTimeLine5sek;  
-            if (want == typeof(TimeLine1min)) return (IMongoCollection<T>) CollTimeLine1min; 
-            if (want == typeof(TimeLine1h))  return (IMongoCollection<T>) CollTimeLine1h;
-            if (want == typeof(TimeLine1day))  return (IMongoCollection<T>) CollTimeLine1day;
+            if (want == typeof(TimeLine5sek)) return (IMongoCollection<T>)CollTimeLine5sek;
+            if (want == typeof(TimeLine1min)) return (IMongoCollection<T>)CollTimeLine1min;
+            if (want == typeof(TimeLine1h)) return (IMongoCollection<T>)CollTimeLine1h;
+            if (want == typeof(TimeLine1day)) return (IMongoCollection<T>)CollTimeLine1day;
             throw new Exception("T type not found");
         }
-        
-        
-        private bool GetLastFind<T>(IMongoCollection<T> db, out T? timeline) where T : Type.TimeLineDb {
+
+
+        private static bool GetLastFind<T>(IMongoCollection<T> db, out T? timeline) where T : TimeLineDb {
             try {
-                timeline = db.FindSync<T>(Builders<T>.Filter.Exists(x => x._Id), new FindOptions<T>() {
+                timeline = db.FindSync(Builders<T>.Filter.Exists(x => x._Id), new FindOptions<T> {
                     Sort = Builders<T>.Sort.Descending(x => x.TimeTicks)
                 }).FirstOrDefault();
             }
@@ -128,7 +124,9 @@ namespace BackendApi.DataBase {
             return true;
         }
 
-        private bool GetLast<T>(out T? point) where T : TimeLineDb => GetLastFind(GetColl<T>(), out point);
+        private bool GetLast<T>(out T? point) where T : TimeLineDb {
+            return GetLastFind(GetColl<T>(), out point);
+        }
 
         private bool FindAllDocsInRange<T>(long ticksStart, long ticksEnd, out T[] timeLineDbs) where T : TimeLineDb {
             try {
@@ -149,14 +147,15 @@ namespace BackendApi.DataBase {
         /// <typeparam name="T"> Higher Time Line </typeparam>
         /// <typeparam name="U"> Lower Time Line </typeparam>
         /// <returns></returns>
-        private bool InsertNextValueInDb<T, U>(long timeTicks,U[] lowerTimeLine) where T : TimeLineDb, new() where U : TimeLineDb, new() {
+        // ReSharper disable once InconsistentNaming
+        private bool InsertNextValueInDb<T, U>(long timeTicks, U[] lowerTimeLine) where T : TimeLineDb, new() where U : TimeLineDb, new() {
             try {
-                GetColl<T>().InsertOne(new T() {
+                GetColl<T>().InsertOne(new T {
                     TimeTicks = timeTicks,
-                    Humidity = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.Humidity),
-                    Temp = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.Temp),
-                    WindDirection = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.WindDirection),
-                    WindSpeed = lowerTimeLine.Length == 0? -1: lowerTimeLine.Average(x => x.WindSpeed),
+                    Humidity = lowerTimeLine.Length == 0 ? -1 : lowerTimeLine.Average(x => x.Humidity),
+                    Temp = lowerTimeLine.Length == 0 ? -1 : lowerTimeLine.Average(x => x.Temp),
+                    WindDirection = lowerTimeLine.Length == 0 ? -1 : lowerTimeLine.Average(x => x.WindDirection),
+                    WindSpeed = lowerTimeLine.Length == 0 ? -1 : lowerTimeLine.Average(x => x.WindSpeed)
                 });
                 return true;
             }
@@ -176,31 +175,37 @@ namespace BackendApi.DataBase {
         /// <typeparam name="U"> Lower Time Line </typeparam>
         /// <returns></returns>
         private bool Update<T, U>(long timeLineRange) where T : TimeLineDb, new() where U : TimeLineDb, new() {
-            if (!GetLast<T>(out var lastTimeLine1Min)) 
+            if (!GetLast<T>(out var lastTimeLine1Min))
                 return false;
-            
+
             if (lastTimeLine1Min is null)
                 return true;
-            
-            if ((lastTimeLine1Min.TimeTicks + timeLineRange) > DateTime.Now.Ticks) 
+
+            if (lastTimeLine1Min.TimeTicks + timeLineRange > DateTime.Now.Ticks)
                 return true;
-            
-            if (!FindAllDocsInRange<U>(lastTimeLine1Min.TimeTicks, lastTimeLine1Min.TimeTicks + timeLineRange, out var timeLineUs)) 
+
+            if (!FindAllDocsInRange<U>(lastTimeLine1Min.TimeTicks, lastTimeLine1Min.TimeTicks + timeLineRange, out var timeLineUs))
                 return false;
-            
+
             return InsertNextValueInDb<T, U>(lastTimeLine1Min.TimeTicks + timeLineRange, timeLineUs);
         }
 
-        private bool Update1min() => Update<TimeLine1min, TimeLine5sek>(TimeSpan.TicksPerMinute);
+        private bool Update1Min() {
+            return Update<TimeLine1min, TimeLine5sek>(TimeSpan.TicksPerMinute);
+        }
 
-        private bool Update1h() => Update<TimeLine1h, TimeLine1min>(TimeSpan.TicksPerHour);
+        private bool Update1H() {
+            return Update<TimeLine1h, TimeLine1min>(TimeSpan.TicksPerHour);
+        }
 
-        private bool Update1day() => Update<TimeLine1day, TimeLine1h>(TimeSpan.TicksPerDay);
+        private bool Update1Day() {
+            return Update<TimeLine1day, TimeLine1h>(TimeSpan.TicksPerDay);
+        }
 
         private bool UpdateAll() {
-            if (!Update1min()) return ThrowErr("Update1min Error");
-            if (!Update1h()) return ThrowErr("Update1h Error");
-            if (!Update1day()) return ThrowErr("Update1day Error");
+            if (!Update1Min()) return ThrowErr("Update1min Error");
+            if (!Update1H()) return ThrowErr("Update1h Error");
+            if (!Update1Day()) return ThrowErr("Update1day Error");
             return true;
         }
 
@@ -213,33 +218,3 @@ namespace BackendApi.DataBase {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

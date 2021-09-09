@@ -1,38 +1,32 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BackendApi.DataBase;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace BackendApi
-{
-    public class Program
-    {
+namespace BackendApi {
+    public class Program {
         public static void Main(string[] args) {
             StaticConf.Init();
             var syncManger = SyncManger.FactoryStart(5000);
-            var iotServerTask = new IOTServer.IOTServer(new IOTServer.IOTServer.IOTServerProps() {
-                Url = StaticConf.DbUrl,
+            var iotServerTask = new IOTServer.IotServer(new IOTServer.IotServer.IotServerProps {
+                Ipv4 = StaticConf.IotIpv4,
                 Port = 3370,
-                AllowKeys = new []{"BrotMot"},
+                AllowKeys = new[] {"BrotMot"},
                 MaxClients = 2,
                 PackSize = 3000,
-                PushStream = syncManger.SyncManger.GetIOTPointWaiter()
+                PushStream = syncManger.SyncManger.GetIotPointWaiter()
             }).Start();
 
-            var dbServerTask = new DataBase.Rope(StaticConf.DbUrl, StaticConf.DbPasswd, syncManger.SyncManger.GetDbPointerWaiter());
-            
+            var dbServerTask = new Rope(StaticConf.DbUrl, StaticConf.DbPasswd, syncManger.SyncManger.GetDbPointerWaiter()).Start();
+
             CreateHostBuilder(args).Build().Run();
             syncManger.Task.Wait(10);
             iotServerTask.Wait(10);
-            
+            dbServerTask.Wait(10);
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args) {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+        }
     }
 }

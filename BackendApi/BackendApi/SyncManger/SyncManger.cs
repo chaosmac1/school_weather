@@ -3,9 +3,10 @@ using BackendApi.Ulitis;
 
 namespace BackendApi {
     public class SyncManger {
-        private WaitPushPop<Point?> _iOTPoint;
         private WaitPushPop<Point?> _dbPoint;
-        private int _delayTimeMs;  
+        private readonly int _delayTimeMs;
+        private WaitPushPop<Point?> _iOTPoint;
+
         public SyncManger(int delayTimeMs) {
             _iOTPoint = new WaitPushPop<Point?>();
             _dbPoint = new WaitPushPop<Point?>();
@@ -18,12 +19,13 @@ namespace BackendApi {
         }
 
         public Task Start() => Task.Run(MoveLoop);
-        
-        public IWaitPush<Point?> GetIOTPointWaiter() => _iOTPoint;
+
+        public IWaitPush<Point?> GetIotPointWaiter() => _iOTPoint;
+
         public IWaitPop<Point?> GetDbPointerWaiter() => _dbPoint;
 
-        private Task MoveLoop() {
-            var deltaTime = new DeltaTimeSleep(_delayTimeMs); 
+        private void MoveLoop() {
+            var deltaTime = new DeltaTimeSleep(_delayTimeMs);
             while (true) {
                 _dbPoint.Push(_iOTPoint.Pop());
                 deltaTime.Sleep();

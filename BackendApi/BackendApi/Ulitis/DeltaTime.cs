@@ -3,24 +3,24 @@ using System.Threading.Tasks;
 
 namespace BackendApi.Ulitis {
     public ref struct DeltaTimeSleep {
-        private long LastWait;
-        private int WaitTimeMs;
+        private long _lastWait;
+        private readonly int _waitTimeMs;
 
         public DeltaTimeSleep(int waitTimeMs) {
-            LastWait = DateTime.Now.Ticks;
-            WaitTimeMs = waitTimeMs;
+            _lastWait = DateTime.Now.Ticks;
+            _waitTimeMs = waitTimeMs;
         }
 
         public DeltaTimeSleep(long waitTimeTicks) {
-            LastWait = DateTime.Now.Ticks;
-            WaitTimeMs = (int)(waitTimeTicks / TimeSpan.TicksPerMillisecond);
+            _lastWait = DateTime.Now.Ticks;
+            _waitTimeMs = (int)(waitTimeTicks / TimeSpan.TicksPerMillisecond);
         }
 
         public void Sleep() {
             var timeNow = DateTime.Now.Ticks;
-            var sleep = WaitTimeMs - (int)((timeNow - LastWait) / TimeSpan.TicksPerMillisecond);
+            var sleep = _waitTimeMs - (int)((timeNow - _lastWait) / TimeSpan.TicksPerMillisecond);
             Task.Delay(sleep).Wait();
-            LastWait = DateTime.Now.Ticks;
+            _lastWait = DateTime.Now.Ticks;
         }
     }
 }

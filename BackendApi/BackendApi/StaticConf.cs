@@ -3,10 +3,6 @@ using System;
 
 namespace BackendApi {
     public static class StaticConf {
-        private struct ConfValue {
-            public string? DbUrl;
-            public string? DbPasswd;
-        }
 
         private static ConfValue? _valueFromFileBuffer;
         private static ConfValue ValueFromFile {
@@ -17,11 +13,23 @@ namespace BackendApi {
             }
             set => _valueFromFileBuffer = value;
         }
-        public static string DbUrl { get => ValueFromFile.DbUrl?? throw new NullReferenceException("DbUrl"); }
-        public static string DbPasswd { get => ValueFromFile.DbPasswd?? throw new NullReferenceException("DbPasswd"); }
+        public static string DbUrl => ValueFromFile.DbUrl ?? throw new NullReferenceException("DbUrl");
+        public static string DbPasswd => ValueFromFile.DbPasswd ?? throw new NullReferenceException("DbPasswd");
+        public static string IotIpv4 => ValueFromFile.IotIpv4 ?? throw new NullReferenceException("IotIpv4");
 
         public static void Init() {
-            throw new NotImplementedException("StaticConf.Init()");
+            ValueFromFile = new ConfValue {
+                DbUrl = "mongodb://127.0.0.1",
+                DbPasswd = "",
+                IotIpv4 = "127.0.0.1"
+            };
+            // TODO StaticConf.Init()
+        }
+
+        private struct ConfValue {
+            public string? DbUrl;
+            public string? DbPasswd;
+            public string? IotIpv4;
         }
     }
 }

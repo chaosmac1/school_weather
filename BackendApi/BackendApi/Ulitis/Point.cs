@@ -1,18 +1,17 @@
 namespace BackendApi.Ulitis {
     public struct Point {
-        internal bool Dead;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public long TimeReal;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public float Temp;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public float WindSpeed;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public float Humidity;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public float WindDirection;
 
-        public Point(bool dead = true) : this() {
-            Dead = dead;
-        }
-
         public Point(long timeReal, float temp, float windSpeed, float humidity, float windDirection) : this() {
-            Dead = false;
             TimeReal = timeReal;
             Temp = temp;
             WindSpeed = windSpeed;

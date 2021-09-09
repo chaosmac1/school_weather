@@ -1,27 +1,24 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace BackendApi.Ulitis {
     public class SempClient {
-        private Socket Socket;
-        private uint PackSize;
-        
+        private readonly uint _packSize;
+        private readonly Socket _socket;
+
         public SempClient(Socket socket, uint packSize) {
-            Socket = socket;
-            PackSize = packSize;
+            _socket = socket;
+            _packSize = packSize;
         }
 
         public static Task FactoryStart(Socket socket, uint packSize, Action<SempClient> action) {
             var sempClient = new SempClient(socket, packSize);
-            return Task.Run((() => action(sempClient)));
+            return Task.Run(() => action(sempClient));
         }
-        
-        
+
+
         public bool ReceiveString(out string? fromClient) {
             if (!Receive(out var span, out var size)) {
                 fromClient = null;
@@ -43,17 +40,17 @@ namespace BackendApi.Ulitis {
 #endif
             }
         }
-        
+
         public bool Receive(out ReadOnlySpan<byte> fromClientSpan, out int size) {
-            if (Socket is null) throw new Exception("Socket is null");
-            var buffer = new byte[this.PackSize];
+            if (_socket is null) throw new Exception("Socket is null");
+            var buffer = new byte[_packSize];
             try {
-                size = Socket.Receive(buffer);
+                size = _socket.Receive(buffer);
                 if (size == -1) {
                     fromClientSpan = Span<byte>.Empty;
                     return false;
                 }
-                
+
                 fromClientSpan = new Span<byte>(buffer, 0, size);
                 return true;
             }
@@ -71,24 +68,24 @@ namespace BackendApi.Ulitis {
         }
 
         public bool SendString(string value) {
-            Span<byte> sendBytes = Span<byte>.Empty;
-            Encoding.UTF8.GetBytes((ReadOnlySpan<char>)new Span<char>(value.ToCharArray()), sendBytes);
+            var sendBytes = Span<byte>.Empty;
+            Encoding.UTF8.GetBytes(new Span<char>(value.ToCharArray()), sendBytes);
 
-            if (!Send((ReadOnlySpan<byte>)sendBytes)) {
+            if (!Send(sendBytes)) {
 #if DEBUG
                 throw new Exception("Error by SendBytes");
 #else
                 return false;
 #endif
             }
-            
+
             return true;
         }
-        
+
         public bool Send(ReadOnlySpan<byte> toClient) {
-            if (Socket is null) throw new Exception("Socket is null");
+            if (_socket is null) throw new Exception("Socket is null");
             try {
-                Socket.Send(toClient);
+                _socket.Send(toClient);
                 return true;
             }
 #if DEBUG
@@ -100,13 +97,14 @@ namespace BackendApi.Ulitis {
                 return false;
 #endif
             }
-            
         }
 
-        public bool Active() => Socket.Connected;
+        public bool Active() => _socket.Connected;
 
         public void Close() {
-            try { Socket.Close(); }
+            try {
+                _socket.Close();
+            }
             catch (Exception) {
                 // ignored
             }

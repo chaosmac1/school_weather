@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 
-namespace LibAllOver {
+namespace BackendApi.Ulitis {
     public static class Sha3 {
         public static string GetSha3Ascii(string msg) {
             var hashAlgo = new Sha3Digest(512);
