@@ -1,24 +1,3 @@
-/*
-Libary
-
-// Marcel
-Socket TCP
-DNS Auflösnung
-
-Send Json  {
-key: string,
-temp: float,
-windSpeed: float,
-humidity: float,
-windDirection: float
-}
-
-Rev Json { error: boolen }
-Port ist erst mal egal
-URL Ist erst mal egal
-
-*/
-
 #include <SPI.h>
 #include <WiFi.h>
 #include <Dns.h>
@@ -34,14 +13,6 @@ IPAddress server(ssid);
 
 char json[] = "{\"key\":"[Contence]",\"temp\":"[Contence]",\"windSpeed\":"[Contence]",\"humidity\":"[Contence]",\"windDirection\":"[Contence]"}";
 JsonObject& test_json = jsonBuffer.parseObject(json); //decode/parse the JSON string to a JsonObject
-
-/* Extract data from JsonObject
-string e_Key = test_json["key"];
-float e_Temp = test_json["temp"];
-float e_WindSpeed = test_json["windSpeed"];
-float e_Humidity = test_json["humidity"];
-float e_WindDirection = test_json["windDirection"];
-*/
 
 WiFiClient client;
 
@@ -70,9 +41,6 @@ void setup() {
 		Serial.println("parseObject() failed");
 		return false;
 	}
-	
-	
-	
 }
 
 void loop() {
