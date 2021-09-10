@@ -45,4 +45,7 @@ void setup() {
 
 void loop() {
 	connect();
+	
+	//send_json() {}
+	//rev_json() {}
 }
