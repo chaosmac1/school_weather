@@ -1,5 +1,10 @@
+#if DEBUG
+#define TEST
+#endif
+
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BackendApi.DataBase;
 using BackendApi.DataBase.Type;
@@ -25,19 +30,56 @@ namespace BackendApi.Controllers {
 
         [HttpGet("all")]
         public TsTimeLineAll GetAll(long startTime, long endTime, string timeValue) {
-            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLineAll();
+            TsTimeLine RandomValues(int min, int max, bool nextLimit = true) {
+                long ticks = TimeSpan.TicksPerMinute;
+                List<TsTimeLine.Point> points = new(10000);
+                var random = new Random();
+                var value = random.Next(min, max);
+                
+                for (long i = startTime; i < endTime; i += ticks) {
+                    points.Add(new TsTimeLine.Point(i, value));
+                    if (nextLimit == false) {
+                        value = random.Next(min, max);
+                    }
+                    else if (nextLimit) {
+                        value += random.Next(-3, 4);
+                        value = value >= max ? max : value;
+                        value = value <= min ? min : value;
+                    }
+                }
 
-            if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
-                ThrowErr("GetTimeLineFromServer Error");
-                return new TsTimeLineAll();
-            }
-
-            return new TsTimeLineAll {
-                Humidity = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Humidity)).ToArray()},
-                Temp = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Temp)).ToArray()},
-                WindDirection = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindDirection)).ToArray()},
-                WindSpeed = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindSpeed)).ToArray()}
+                var res = new TsTimeLine.Point[points.Count];
+                
+                
+                return new TsTimeLine() {Points = points.ToArray()};
+            } 
+            
+#if TEST
+            var windSpeed = RandomValues(0, 100, true);
+            
+            return new TsTimeLineAll() {
+                Humidity = RandomValues(0, 30),
+                Temp = RandomValues(0, 30),
+                WindDirection = new TsChart(
+                    windSpeedPoints: windSpeed!, 
+                    windDirePoints:RandomValues(0, 359, false)),
+                WindSpeed = windSpeed
             };
+#endif
+            
+            // if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLineAll();
+            //
+            // if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
+            //     ThrowErr("GetTimeLineFromServer Error");
+            //     return new TsTimeLineAll();
+            // }
+            //
+            // return new TsTimeLineAll {
+            //     Humidity = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Humidity)).ToArray()},
+            //     Temp = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Temp)).ToArray()},
+            //     WindDirection = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindDirection)).ToArray()},
+            //     WindSpeed = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindSpeed)).ToArray()}
+            // };
         }
 
         [HttpGet("temp")]
@@ -53,50 +95,50 @@ namespace BackendApi.Controllers {
                 Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Temp)).ToArray()
             };
         }
-
-        [HttpGet("windspeed")]
-        public TsTimeLine GetWindSpeed(long startTime, long endTime, string timeValue) {
-            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
-
-            if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
-                ThrowErr("GetTimeLineFromServer Error");
-                return new TsTimeLine();
-            }
-
-            return new TsTimeLine {
-                Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindSpeed)).ToArray()
-            };
-        }
-
-        [HttpGet("humidity")]
-        public TsTimeLine GetHumidity(long startTime, long endTime, string timeValue) {
-            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
-
-            if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
-                ThrowErr("GetTimeLineFromServer Error");
-                return new TsTimeLine();
-            }
-
-            return new TsTimeLine {
-                Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Humidity)).ToArray()
-            };
-        }
-
-
-
-        [HttpGet("windDirection")]
-        public TsTimeLine GetWindDirection(long startTime, long endTime, string timeValue) {
-            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
-
-            if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
-                ThrowErr("GetTimeLineFromServer Error");
-                return new TsTimeLine();
-            }
-
-            return new TsTimeLine {
-                Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindDirection)).ToArray()
-            };
-        }
+        //
+        // [HttpGet("windspeed")]
+        // public TsTimeLine GetWindSpeed(long startTime, long endTime, string timeValue) {
+        //     if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
+        //
+        //     if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
+        //         ThrowErr("GetTimeLineFromServer Error");
+        //         return new TsTimeLine();
+        //     }
+        //
+        //     return new TsTimeLine {
+        //         Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindSpeed)).ToArray()
+        //     };
+        // }
+        //
+        // [HttpGet("humidity")]
+        // public TsTimeLine GetHumidity(long startTime, long endTime, string timeValue) {
+        //     if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
+        //
+        //     if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
+        //         ThrowErr("GetTimeLineFromServer Error");
+        //         return new TsTimeLine();
+        //     }
+        //
+        //     return new TsTimeLine {
+        //         Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Humidity)).ToArray()
+        //     };
+        // }
+        //
+        //
+        //
+        // [HttpGet("windDirection")]
+        // public TsTimeLine GetWindDirection(long startTime, long endTime, string timeValue) {
+        //     if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLine();
+        //
+        //     if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
+        //         ThrowErr("GetTimeLineFromServer Error");
+        //         return new TsTimeLine();
+        //     }
+        //
+        //     return new TsTimeLine {
+        //         Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindDirection)).ToArray()
+        //     };
+        // }
 
 
         private bool GetTimeLineFromServer(long startTime, long endTime, string timeValue, out List<TimeLineDb> res) {
@@ -167,22 +209,68 @@ namespace BackendApi.Controllers {
             return false;
 #endif
         }
+        
+        public class TsChart {
+            public Radio[] Radios { get; set; }
 
+            public TsChart() {
+            }
+
+            public TsChart(TsTimeLine windSpeedPoints, TsTimeLine windDirePoints) {
+                static int Average(List<float> list) {
+                    if (list.Count == 0) return 0;
+                    long res = 0;
+                    foreach (var i in list) res += (int)i;
+                    if (res == 0) return 0;
+                    return (int)(res / list.Count);
+                }
+                
+                const int radioGruppe = 30;
+                
+                var buffer = new List<float>[360/30];
+                for (int i = 0; i < buffer.Length; i++) buffer[i] = new List<float>();
+                
+                for (int i = 0; i < windSpeedPoints.Points!.Length; i++) {
+                    buffer[(int)(windDirePoints.Points[i].Value / radioGruppe)].Add(windSpeedPoints.Points[i].Value);
+                }
+
+                
+                
+                this.Radios = new Radio[360/30];
+                for (int i = 0; i < buffer.Length; i++) {
+                    this.Radios[i] = new Radio((i * radioGruppe).ToString() + "°", Average(buffer[i]));
+                }
+            }
+
+            public class Radio {
+                public string Vector { get; set; }
+                public int Value { get; set; }
+
+                public Radio(string vector, int value) {
+                    Vector = vector;
+                    Value = value;
+                }
+            }
+        }
+        
         public class TsTimeLine {
             // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public Point[]? Points { get; set; }
-
+            
             public class Point {
 
                 public Point(long pointId, float value) {
                     PointId = pointId;
                     Value = value;
+                    Date = new DateTime(pointId).ToString(CultureInfo.CurrentCulture);
                 }
                 
                 // ReSharper disable once UnusedAutoPropertyAccessor.Global
                 public long PointId { get; set; }
                 // ReSharper disable once UnusedAutoPropertyAccessor.Global
                 public float Value { get; set; }
+                // ReSharper disable once UnusedAutoPropertyAccessor.Global
+                public string? Date { get; set; }
             }
         }
         public class TsTimeLineAll {
@@ -193,7 +281,7 @@ namespace BackendApi.Controllers {
             // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public TsTimeLine? Humidity { get; set; }
             // ReSharper disable once UnusedAutoPropertyAccessor.Global
-            public TsTimeLine? WindDirection { get; set; }
+            public TsChart? WindDirection { get; set; }
         }
     }
 }

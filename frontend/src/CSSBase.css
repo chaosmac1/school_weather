@@ -1,0 +1,48 @@
+/* region Color */
+.CSSBase-ColorBgDark { background-color: #0B0C10; }
+
+.CSSBase-ColorBgDark2 { background-color: #090a0e; }
+
+.CSSBase-ColorBgMidDark { background-color: #13181f; }
+
+.CSSBase-ColorBgLiteDark { background-color: #1F2833; }
+
+.CSSBase-ColorBgHighlight { background-color: #45a29e; }
+
+
+.CSSBase-ColorDark { color: #0B0C10; }
+
+.CSSBase-ColorDark2 { color: #090a0e; }
+
+.CSSBase-ColorMidDark { color: #13181f; }
+
+.CSSBase-ColorLiteDark { color: #1F2833; }
+
+.CSSBase-ColorHighlight {color: #45a29e; }
+/* endregion */
+
+.CSSBase-MidMargin {
+    margin: 0px auto;
+}
+
+
+.CSSBase-BackgroundHeader {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+}
+
+.CSSBase-TextHigh {
+    color: #66FCF1;
+}
+
+.CSSBase-TextNormal {
+    color: #C5C6C7;
+    font-size: 14px;
+}
+
+
