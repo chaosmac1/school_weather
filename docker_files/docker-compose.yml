@@ -1,0 +1,23 @@
+version: "3.3"
+services:
+  mongodb:
+     image: mongo
+     restart: always
+     ports:
+       - "27017:27017"
+  
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "5001:5001"
+      - "3370:3370"
+  
+  frontend:
+     build: ./frontend
+     restart: always
+     ports:
+       - "80:80"
+       - "443:443"
+     
+  

@@ -1,0 +1,12 @@
+# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
+WORKDIR /code
+EXPOSE 5001
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://*:5001
+COPY . .
+#CMD ["ll"]
+CMD ["./build/BackendApi"]
+#CMD ["dotnet", "dev-certs https"]
+# , "--urls http://0.0.0.0:5001"
+
