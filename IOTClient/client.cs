@@ -53,6 +53,7 @@ public static class tool {
     	}
 }
 
+/*
 private class ReceiveIotValue {
 	// ReSharper disable once UnusedAutoPropertyAccessor.Local
         public string? Key { get; set; }
@@ -78,10 +79,18 @@ private class ReceiveIotValue {
                 }
 	}
 }
-
+*/
+	
 void loop() {
 	connect();
 	
-	//send_json() {}
-	//rev_json() {}
+	/*
+	send_json() {
+	}
+	*/
+	/*
+	void rev_json() {
+		
+	}
+	*/
 }
