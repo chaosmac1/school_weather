@@ -134,6 +134,54 @@ public:
 };
 
 
+template <typename T>
+class span {
+    size_t size;
+    T * pointer_to_array;
+public:
+    span(const T &arr, const size_t size) {
+        this->size = size;
+        this->pointer_to_array = arr;
+    }
+
+    size_t get_size() const {
+        return size;
+    }
+
+    T *get_ptr() const {
+        return pointer_to_array;
+    }
+
+    array<T> to_own() {
+        return array<T>(new T[this->size], size);
+    }
+};
+
+class weather_client {
+private:
+
+public:
+    weather_client() {
+
+    }
+
+    void send(span<byte> send) {
+        
+    }
+
+    array<byte> receive() {
+        array<byte> buffer = array<byte>(512);
+
+        // TODO Write receive
+
+        throw true;
+        return buffer;
+    }
+};
+
+
+
+
 
 string hostname = "myNetwork";
 char pass[] = "myPassword";
