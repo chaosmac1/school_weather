@@ -20,19 +20,6 @@ void connect() {
 	}
 }
 
-public static class tool {
-	public static byte[] JsonStringToByteArray(string jsonByteString) {
-        	jsonByteString = jsonByteString.Substring(1, jsonByteString.Length - 2);
-        	string[] arr = jsonByteString.Split(',');
-        	byte[] bResult = new byte[arr.Length];
-        	
-		for (int i = 0; i < arr.Length; i++) {
-        	    bResult[i] = byte.Parse(arr[i]);
-        	}
-        	return bResult;
-    	}
-}
-
 void setup() {
 	Serial.begin(9600);
 	Serial.println("Attempting to connect to WPA network...");
@@ -50,6 +37,45 @@ void setup() {
 	if(!test_json.success()) {
 		Serial.println("parseObject() failed");
 		return false;
+	}
+}
+
+public static class tool {
+	public static byte[] JsonStringToByteArray(string jsonByteString) {
+        	jsonByteString = jsonByteString.Substring(1, jsonByteString.Length - 2);
+        	string[] arr = jsonByteString.Split(',');
+        	byte[] bResult = new byte[arr.Length];
+        	
+		for (int i = 0; i < arr.Length; i++) {
+        	    bResult[i] = byte.Parse(arr[i]);
+        	}
+        	return bResult;
+    	}
+}
+
+private class ReceiveIotValue {
+	// ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public string? Key { get; set; }
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public float Temp { get; set; }
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public float WindSpeed { get; set; }
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public float Humidity { get; set; }
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        public float WindDirection { get; set; }
+
+        public Point ToPoint(long createTime) {
+        	return new(createTime, Temp, WindSpeed, Humidity, WindDirection);
+        }
+
+        public static ReceiveIotValue? Factory(string jsonString) {
+		try {
+			return JsonConvert.DeserializeObject<ReceiveIotValue>(jsonString);
+                }
+                catch (Exception) {
+                    return null;
+                }
 	}
 }
 
