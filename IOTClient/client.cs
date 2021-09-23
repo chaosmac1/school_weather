@@ -2,6 +2,8 @@
 #include <WiFi.h>
 #include <Dns.h>
 #include <ArduinoJson.h>
+#include <WebSocketServer.h>
+#include <HTTPClient.h>
 
 typedef std::string str;
 typedef char byte;
@@ -200,6 +202,7 @@ void connect() {
 
 void setup() {
 	Serial.begin(9600);
+	WiFi.begin(ssid, passw);
 	Serial.println("Attempting to connect to WPA network...");
 	Serial.print("SSID: ");
 	Serial.println(hostname);
@@ -231,44 +234,26 @@ public static class tool {
     	}
 }
 
-/*
-private class ReceiveIotValue {
-	// ReSharper disable once UnusedAutoPropertyAccessor.Local
-        public string? Key { get; set; }
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        public float Temp { get; set; }
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        public float WindSpeed { get; set; }
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        public float Humidity { get; set; }
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        public float WindDirection { get; set; }
-
-        public Point ToPoint(long createTime) {
-        	return new(createTime, Temp, WindSpeed, Humidity, WindDirection);
-        }
-
-        public static ReceiveIotValue? Factory(string jsonString) {
-		try {
-			return JsonConvert.DeserializeObject<ReceiveIotValue>(jsonString);
-                }
-                catch (Exception) {
-                    return null;
-                }
-	}
-}
-*/
-	
 void loop() {
 	connect();
+	WiFiClient client = server.available();
 	
 	/*
 	send_json() {
+		client.POST(weather);
 	}
 	*/
+	
 	/*
 	void rev_json() {
-		
+		if(webSocketServer.handshake(client)) {
+			data = webSocketServer.getData();
+ 
+      			if (data.length() > 0) {
+         			handleReceivedMessage(data);
+         			webSocketServer.sendData(data);
+      			}
+		}
 	}
 	*/
 }
