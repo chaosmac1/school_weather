@@ -1,19 +1,21 @@
 # Projektdokumentation - Status: unfinished
-[![Build Status](https://travis-ci.org/marktext/marktext.svg?branch=gghhhh)](https://travis-ci.org/marktext/marktext)
 
 ## Inhalt
-- Projektbeschreiugn
+- Projektbeschreiung
 - Website Deployment
   -> Requirements
   -> Hardware
   -> Software
-- Used Ports 80 & 3370
 - Installation
     -> Commands
-  (For HTTPS you're using cloudfare and/or yaml file, certbot: yes)
 - Quellen
 
 ## Projektbeschreibung:
+
+In this schoolproject we build two weatherstations, one on top of the school roof and another near the Steinhuder Sea,
+that collect data with an Arduino BME280 sensor. The Data like the wind speed, wind direction, temperature, air pressure, altitude
+and a timestamp will be detected. For the evaluation as well as the graphic representation of the results the collected
+information will be send via a client/server application to a central website.
 
 In diesem Schulprojekt werden zwei Wetterstation gebaut, eine auf dem Schuldach und die andere am Steinhuder Meer, die mithilfe eines Arduino BME280 Sensor's? Daten wie
 die Windgeschwindigkeit, Windrichtung, Temperatur, Luftdruck und Höhe des Sensors und das Datum (Timestamp) ermittelt und anschließend dank einer Client/Server Applikation
@@ -25,12 +27,10 @@ an eine Zentrale Webseite, zur Auswertung sowie der grafischen Darstellung der E
 - docker-compose
 - git
 
-### Hardware
+## Network
+The ports 80, HTTP, and 3370, TCP/UDP, are being used for this project.
 
-### Software
-
-## Used Ports
-Für dieses Projekt wurden der Standard Port 80 von HTTP und Port 3370 von ...
+To increase performance and secrurity we decided to use ***cloudflare*** and ***certbot*** and ***yaml files*** for data serialization.
 
 ## Installation
 Download brance
