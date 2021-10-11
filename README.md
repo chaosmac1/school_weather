@@ -1,14 +1,5 @@
 # Projektdokumentation - Status: unfinished
 
-## Inhalt
-- Projektbeschreiung
-- Website Deployment
-  -> Requirements
-  -> Hardware
-  -> Software
-- Installation
-    -> Commands
-
 ## Projektbeschreibung:
 
 In this schoolproject we build two weatherstations, one on top of the school roof and another near the Steinhuder Sea,
