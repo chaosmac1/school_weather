@@ -8,7 +8,6 @@
   -> Software
 - Installation
     -> Commands
-- Quellen
 
 ## Projektbeschreibung:
 
