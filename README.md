@@ -30,11 +30,11 @@ an eine Zentrale Webseite, zur Auswertung sowie der grafischen Darstellung der E
 ## Network
 Die Ports 80, HTTP, und 3370, TCP/UDP, werden für dieses Projekt verwendet.
 
-Zum erhöhen der Leistung und Sicherheit entschieden wir uns ***cloudflare*** und ***certbot*** sowie ***yaml files*** für die Datenserialisierung.
+Zum erhöhen der Leistung und Sicherheit entschieden wir uns ***cloudflare*** und ***certbot*** sowie ***yaml files*** für docker komponieren.
 
 The ports 80, HTTP, and 3370, TCP/UDP, are being used for this project.
 
-To increase performance and secrurity we decided to use ***cloudflare*** and ***certbot*** and ***yaml files*** for data serialization.
+To increase performance and secrurity we decided to use ***cloudflare*** and ***certbot*** and ***yaml files*** for docker compose.
 
 ## Installation
 Download brance
