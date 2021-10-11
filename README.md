@@ -29,7 +29,7 @@ To increase performance and secrurity we decided to use ***cloudflare*** and ***
 ## Installation
 Download brance
 ```bash
-$ git clone TODO
+$ git clone https://github.com/chaosmac1/school_weather.git
 ```
 Run Build Script
 ```bash
