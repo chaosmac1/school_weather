@@ -1,5 +1,6 @@
 using System;
 using BackendApi.DataBase.Type;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace BackendApi.DataBase {
@@ -11,6 +12,7 @@ namespace BackendApi.DataBase {
 
         public static IMongoCollection<T>? GetColByType<T>(string url) where T : TimeLineDb {
             System.Type type = typeof(T);
+            
             if (type == CollationTypeOf.TTimeLine5Sek) return (IMongoCollection<T>?)GetTimeLine5sek(url);
             if (type == CollationTypeOf.TTimeLine1Min) return (IMongoCollection<T>?)GetTimeLine1min(url);
             if (type == CollationTypeOf.TTimeLine1H) return (IMongoCollection<T>?)GetTimeLine1h(url);
@@ -21,6 +23,14 @@ namespace BackendApi.DataBase {
         public static IMongoCollection<TimeLine5sek>? GetTimeLine5sek(string url) {
             try {
                 var client = GetMongoClient(url);
+                var isMongoLive = client.GetDatabase(DataBaseName.TimeLine)
+                    .RunCommandAsync((Command<BsonDocument>) "{ping:1}").Wait(1000);
+                if (!isMongoLive) {
+#if DEBUG
+                    throw new Exception("MongoDb Server Not Available");
+#endif
+                    return null;
+                }
                 var coll = client.GetDatabase(DataBaseName.TimeLine).GetCollection<TimeLine5sek>(CollationName.TimeLine5Sek);
                 return coll;
             }

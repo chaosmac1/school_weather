@@ -1,48 +1,48 @@
 using System.Threading.Tasks;
 
 namespace BackendApi.Ulitis {
-    public struct WaitPushPop<T> : IWaitPush<T>, IWaitPop<T> {
-        private bool _allowPop;
+    public class WaitPushPop<T> : IWaitPush<T>, IWaitPop<T> {
+        private bool allowPop;
         private T? _value;
-
+        private const int DelayTime = 100;
         public void Push(T value) {
-            while (_allowPop) Task.Delay(10).Wait();
+            while (allowPop) Task.Delay(DelayTime).Wait();
 
-            _allowPop = true;
+            allowPop = true;
             _value = value;
         }
 
         public async Task PushAsync(T value) {
-            while (_allowPop) await Task.Delay(10);
+            while (allowPop) await Task.Delay(DelayTime);
 
-            _allowPop = true;
+            allowPop = true;
             _value = value;
         }
 
         public T? Pop() {
-            while (!_allowPop) Task.Delay(10).Wait();
+            while (!allowPop) Task.Delay(DelayTime).Wait();
 
             var value = _value;
             _value = default;
-            _allowPop = false;
+            allowPop = false;
             return value;
         }
 
-        public bool CanPush() {
-            return !_allowPop;
+        public async Task<T?> PopAsync() {
+            while (!allowPop) await Task.Delay(DelayTime);
+            var value = _value;
+            _value = default;
+            allowPop = false;
+            return value;
         }
 
-        public bool CanPop() {
-            return _allowPop;
-        }
+        public bool CanPush() => !allowPop;
 
-        public IWaitPush<T> GetPushOnly() {
-            return this;
-        }
+        public bool CanPop() => allowPop;
 
-        public IWaitPop<T> GetPopOnly() {
-            return this;
-        }
+        public IWaitPush<T> GetPushOnly() => this;
+
+        public IWaitPop<T> GetPopOnly() => this;
     }
 
     public interface IWaitPush<T> {
@@ -50,8 +50,10 @@ namespace BackendApi.Ulitis {
         public bool CanPush();
         public Task PushAsync(T value);
     }
+    
     public interface IWaitPop<T> {
         public T? Pop();
+        public Task<T?> PopAsync();
         public bool CanPop();
     }
 }

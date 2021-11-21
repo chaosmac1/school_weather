@@ -29,9 +29,9 @@ namespace BackendApi.IOTServer {
             _pushStream = props.PushStream;
         }
 
-        public Task Start() {
-            return Task.Run(Run);
-        }
+        ~IotServer() => _socket?.Close();
+
+        public Task Start() => Task.Run(Run);
 
         public void Run() {
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -46,15 +46,8 @@ namespace BackendApi.IOTServer {
                 SempClient.FactoryStart(client, _packSize, ServerClientFunc);
             }
         }
-
+    
         private void ServerClientFunc(SempClient client) {
-            static bool ThrowError(string msg) {
-#if DEBUG
-                throw new Exception(msg);
-#else
-                return false;
-#endif
-            }
             const string ok = "{error: false}";
             const string error = "{error: true}";
 
@@ -64,28 +57,26 @@ namespace BackendApi.IOTServer {
                     ThrowError("client.ReceiveString()");
                 }
                 
-                var createTime = DateTime.Now.Ticks;
                 var iotTimeData = ReceiveIotValue.Factory(json!);
 
                 if (iotTimeData is null) {
-#if DEBUG
-                    throw new NullReferenceException("iotTimeData Is Null");
-#else
-                    client.SendString(error);
-                    client.Close();
-#endif
+                    SendErrCloseOrThrowInDebug(client, error, "iotTimeData Is Null");
+                    break;
                 }
+
 
                 if (_allowKeys.All(x => iotTimeData!.Key != x)) {
-#if DEBUG
-                    throw new Exception("Key not Same");
-#else
-                    client.SendString(error);
-                    client.Close();
-#endif
-                }
-
-                var pushTask = _pushStream.PushAsync(new Point());
+                    SendErrCloseOrThrowInDebug(client, error, "Key not Same");
+                    break;
+                } 
+                    
+                var pushTask = _pushStream.PushAsync(new Point() {
+                    TimeReal = DateTime.Now.Ticks,
+                    Humidity = iotTimeData.Humidity,
+                    Temp = iotTimeData.Temp,
+                    WindDirection = iotTimeData.WindDirection,
+                    WindSpeed = iotTimeData.WindSpeed
+                });
 
                 if (!client.SendString(ok)) {
                     pushTask.Wait();
@@ -95,6 +86,14 @@ namespace BackendApi.IOTServer {
             }
         }
 
+        private static bool ThrowError(string msg) {
+#if DEBUG
+            throw new Exception(msg);
+#else
+            return false;
+#endif
+        }
+        
         public override string ToString() {
             return "Socket Info:\n" +
                    $"  Ipv4: {_ipv4}\n" +
@@ -123,10 +122,6 @@ namespace BackendApi.IOTServer {
             // ReSharper disable once UnusedAutoPropertyAccessor.Local
             public float WindDirection { get; set; }
 
-            public Point ToPoint(long createTime) {
-                return new(createTime, Temp, WindSpeed, Humidity, WindDirection);
-            }
-
             public static ReceiveIotValue? Factory(string jsonString) {
                 try {
                     return JsonConvert.DeserializeObject<ReceiveIotValue>(jsonString);
@@ -135,6 +130,20 @@ namespace BackendApi.IOTServer {
                     return null;
                 }
             }
+        }
+
+        private static void SendErrCloseOrThrowInDebug(SempClient client, string sendValue, string msgError) {
+#if DEBUG
+            throw new Exception(msgError);
+#else
+            try
+            {
+                client.SendString(sendValue);
+                client.Close();
+                return;
+            }
+            catch (Exception e) { }
+#endif
         }
     }
 }

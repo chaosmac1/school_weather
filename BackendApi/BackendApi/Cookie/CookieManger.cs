@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BackendApi {
+namespace BackendApi.Cookie {
     public static class CookieManger {
         private static readonly long MaxAgeTicks = TimeSpan.TicksPerDay;
         private static readonly List<(long createDay, string key)> Buffer = new(10);

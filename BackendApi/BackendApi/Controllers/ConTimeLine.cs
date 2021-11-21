@@ -1,5 +1,5 @@
 #if DEBUG
-#define TEST
+//#define TEST
 #endif
 
 using System;
@@ -30,6 +30,7 @@ namespace BackendApi.Controllers {
 
         [HttpGet("all")]
         public TsTimeLineAll GetAll(long startTime, long endTime, string timeValue) {
+#if TEST
             TsTimeLine RandomValues(int min, int max, bool nextLimit = true) {
                 long ticks = TimeSpan.TicksPerMinute;
                 List<TsTimeLine.Point> points = new(10000);
@@ -53,8 +54,7 @@ namespace BackendApi.Controllers {
                 
                 return new TsTimeLine() {Points = points.ToArray()};
             } 
-            
-#if TEST
+
             var windSpeed = RandomValues(0, 100, true);
             
             return new TsTimeLineAll() {
@@ -65,21 +65,21 @@ namespace BackendApi.Controllers {
                     windDirePoints:RandomValues(0, 359, false)),
                 WindSpeed = windSpeed
             };
-#endif
+#else
+            if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLineAll();
             
-            // if (!string.IsNullOrEmpty(timeValue)) return new TsTimeLineAll();
-            //
-            // if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
-            //     ThrowErr("GetTimeLineFromServer Error");
-            //     return new TsTimeLineAll();
-            // }
-            //
-            // return new TsTimeLineAll {
-            //     Humidity = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Humidity)).ToArray()},
-            //     Temp = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Temp)).ToArray()},
-            //     WindDirection = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindDirection)).ToArray()},
-            //     WindSpeed = new TsTimeLine {Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.WindSpeed)).ToArray()}
-            // };
+            if (!GetTimeLineFromServer(startTime, endTime, timeValue, out var timeLineDbs)) {
+                ThrowErr("GetTimeLineFromServer Error");
+                return new TsTimeLineAll();
+            }
+
+            return new TsTimeLineAll {
+                Humidity = TsTimeLine.FactoryHumidity(timeLineDbs),
+                Temp = TsTimeLine.FactoryTemp(timeLineDbs),
+                WindDirection = TsChart.Factory(timeLineDbs),
+                WindSpeed = TsTimeLine.FactoryWindSpeed(timeLineDbs)
+            };
+#endif
         }
 
         [HttpGet("temp")]
@@ -92,7 +92,7 @@ namespace BackendApi.Controllers {
             }
 
             return new TsTimeLine {
-                Points = (from i in timeLineDbs select new TsTimeLine.Point(i.TimeTicks, i.Temp)).ToArray()
+                Points = (from i in timeLineDbs select new TsTimeLine.Point(i.DateTime.Ticks, i.Temp)).ToArray()
             };
         }
         //
@@ -182,9 +182,9 @@ namespace BackendApi.Controllers {
             if (db is null) return false;
 
             res = db.FindSync(
-                Builders<T>.Filter.Gte(x => x.TimeTicks, tickStart) &
-                Builders<T>.Filter.Lt(x => x.TimeTicks, tickEnd),
-                new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.TimeTicks)}
+                Builders<T>.Filter.Gte(x => x.DateTime, new DateTime(tickStart)) &
+                Builders<T>.Filter.Lt(x => x.DateTime, new DateTime(tickEnd)),
+                new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.DateTime)}
             ).ToEnumerable().ToList();
             return true;
         }
@@ -195,9 +195,9 @@ namespace BackendApi.Controllers {
             if (db is null) return false;
 
             res = db.FindSync(
-                Builders<T>.Filter.Gte(x => x.TimeTicks, tickStart) &
-                Builders<T>.Filter.Lt(x => x.TimeTicks, tickEnd),
-                new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.TimeTicks)}
+                Builders<T>.Filter.Gte(x => x.DateTime, new DateTime(tickStart)) &
+                Builders<T>.Filter.Lt(x => x.DateTime, new DateTime(tickEnd)),
+                new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.DateTime)}
             ).ToEnumerable().ToList() as List<U>;
             return true;
         }
@@ -211,11 +211,30 @@ namespace BackendApi.Controllers {
         }
         
         public class TsChart {
-            public Radio[] Radios { get; set; }
+            private Radio[]? _radios = null;
 
-            public TsChart() {
+            public Radio[] Radios {
+                get => _radios?? throw new NullReferenceException(nameof(_radios));
+                set {
+                    if (_radios is null) throw new NullReferenceException(nameof(_radios));
+                    _radios = value;
+                }
             }
 
+            public static TsChart Factory(List<TimeLineDb> list) {
+                return new TsChart(
+                    windDirePoints: new TsTimeLine() {
+                        Points =
+                            (from i in list select new TsTimeLine.Point(i.DateTime.Ticks, i.WindDirection))
+                            .ToArray()
+                    },
+                    windSpeedPoints: new TsTimeLine() {
+                        Points =
+                            (from i in list select new TsTimeLine.Point(i.DateTime.Ticks, i.WindSpeed)).ToArray()
+                    }
+                );
+            }
+            
             public TsChart(TsTimeLine windSpeedPoints, TsTimeLine windDirePoints) {
                 static int Average(List<float> list) {
                     if (list.Count == 0) return 0;
@@ -256,6 +275,25 @@ namespace BackendApi.Controllers {
         public class TsTimeLine {
             // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public Point[]? Points { get; set; }
+
+            public static TsTimeLine FactoryTemp(List<TimeLineDb> list) {
+                return new TsTimeLine {
+                    Points =
+                        (from i in list select new TsTimeLine.Point(i.DateTime.Ticks, i.Temp)).ToArray()
+                };
+            }
+
+            public static TsTimeLine FactoryWindSpeed(List<TimeLineDb> list) {
+                return new TsTimeLine {
+                    Points =
+                        (from i in list select new TsTimeLine.Point(i.DateTime.Ticks, i.WindSpeed)).ToArray()
+                };
+            }
+
+            public static TsTimeLine FactoryHumidity(List<TimeLineDb> list) {
+                return new TsTimeLine {Points = 
+                    (from i in list select new TsTimeLine.Point(i.DateTime.Ticks, i.Humidity)).ToArray()};
+            }
             
             public class Point {
 

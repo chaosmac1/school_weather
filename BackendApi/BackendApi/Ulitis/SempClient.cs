@@ -68,8 +68,8 @@ namespace BackendApi.Ulitis {
         }
 
         public bool SendString(string value) {
-            var sendBytes = Span<byte>.Empty;
-            Encoding.UTF8.GetBytes(new Span<char>(value.ToCharArray()), sendBytes);
+            var sendBytes = new byte[value.Length];
+            Encoding.UTF8.GetBytes(value.ToCharArray(), sendBytes);
 
             if (!Send(sendBytes)) {
 #if DEBUG

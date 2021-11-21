@@ -23,9 +23,8 @@ namespace BackendApi.Controllers {
             if (string.IsNullOrEmpty(username)) return new TsCookie {Error = true, ErrorMsg = "Username is Null Or Empty"};
             if (string.IsNullOrEmpty(passwd)) return new TsCookie {Error = true, ErrorMsg = "Password is Null Or Empty"};
 
-            static TsCookie TsCookie500() {
-                return new() {Error = true, ErrorMsg = "500"};
-            }
+            static TsCookie TsCookie500() => new() {Error = true, ErrorMsg = "500"};
+            
             static TsCookie TsCookie500Err(string msg) {
 #if DEBUG
                 throw new Exception(msg);
@@ -61,7 +60,7 @@ namespace BackendApi.Controllers {
             if (string.IsNullOrEmpty(oldPasswd)) return ThrowErr("oldPasswd Is Empty Or Null");
             if (string.IsNullOrEmpty(newPasswd)) return ThrowErr("newPasswd Is Empty Or Null");
 
-            if (!CookieManger.KeyExist(key)) return ThrowErr("key Not Exist");
+            if (!Cookie.CookieManger.KeyExist(key)) return ThrowErr("key Not Exist");
             if (!GetAccount(out var acc)) return ThrowErr("Acc Not Found");
             if (acc!.PasswdHash != Sha3.GetSha3Utf8(oldPasswd)) return ThrowErr("Password Is False");
 
@@ -108,8 +107,8 @@ namespace BackendApi.Controllers {
         }
 
         private static string? PushNewKey() {
-            var key = Sha3.GetSha3Utf8(DateTime.Now.Ticks + "daspoidwajlkadslkladjsdasjlkwoejkwopek");
-            CookieManger.Push(key);
+            var key = Sha3.GetSha3Utf8(Cookie.CookieBuilder.Build());
+            Cookie.CookieManger.Push(key);
             return key;
         }
 
