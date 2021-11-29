@@ -1,5 +1,9 @@
 # Projektdokumentation - Status: in Arbeit
 
+Sprache zu: [Deutsch](https://github.com/chaosmac1/school_weather/blob/main/README_DE.md)
+
+Sprache zu: [Englisch](https://github.com/chaosmac1/school_weather/blob/main/README.md)
+
 ## Projektbeschreibung:
 
 In diesem Schulprojekt werden zwei Wetterstation gebaut, eine auf dem Schuldach und die andere am Steinhuder Meer, die mithilfe eines Arduino BME280 Sensor's? Daten wie
