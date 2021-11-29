@@ -7,12 +7,12 @@ die Windgeschwindigkeit, Windrichtung, Temperatur, Luftdruck und Höhe des Senso
 an eine Zentrale Webseite, zur Auswertung sowie der grafischen Darstellung der Ergebnisse, weiterleitet.
 
 ## Website Deployment
-### Requirements
+### Anforderungen
 - docker
 - docker-compose
 - git
 
-## Network
+## Netzwerk
 Die Ports 80, HTTP, und 3370, TCP/UDP, werden für dieses Projekt verwendet.
 
 Zum erhöhen der Leistung und Sicherheit entschieden wir uns ***cloudflare*** und ***certbot*** sowie ***yaml files*** für docker komponieren.
