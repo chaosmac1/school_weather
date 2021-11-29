@@ -1,4 +1,4 @@
-# Projektdokumentation - Status: unfinished
+# Projektdokumentation - Status: in Arbeit
 
 ## Projektbeschreibung:
 
