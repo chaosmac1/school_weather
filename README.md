@@ -1,6 +1,8 @@
-# Projektdokumentation - Status: unfinished
+# Project documentation - Status: unfinished
 
-## Projektbeschreibung:
+German: [here](myLib/README_DE.md)
+
+## Project description:
 
 In this schoolproject we build two weatherstations, one on top of the school roof and another near the Steinhuder Sea,
 that collect data with an Arduino BME280 sensor. The Data like the wind speed, wind direction, temperature, air pressure, altitude
@@ -27,7 +29,7 @@ The ports 80, HTTP, and 3370, TCP/UDP, are being used for this project.
 To increase performance and secrurity we decided to use ***cloudflare*** and ***certbot*** and ***yaml files*** for docker compose.
 
 ## Installation
-Download brance
+Download branche
 ```bash
 $ git clone https://github.com/chaosmac1/school_weather.git
 ```
