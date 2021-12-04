@@ -2,7 +2,7 @@ import random
 import socket
 import json
 
-ip = "192.168.2.21"
+ip = "127.0.0.1"
 key = "BrotMot"
 port = 3380
 

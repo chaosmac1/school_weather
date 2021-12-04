@@ -108,11 +108,11 @@ namespace BackendApi.DataBase {
 #endif
         }
 
-        private static class DataBaseName {
+        public static class DataBaseName {
             public const string TimeLine = "time_line";
         }
 
-        private static class CollationName {
+        public static class CollationName {
             public const string TimeLine5Sek = "time_line_5sek";
             public const string TimeLine1Min = "time_line_1min";
             public const string TimeLine1day = "time_line_1day";

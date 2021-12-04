@@ -1,36 +1,15 @@
 using System;
 
 namespace BackendApi.Ulitis {
-    public struct Point
-    {
-        private long? _TimeReal;
-        public long TimeReal { 
-            get { return _TimeReal?? throw new NullReferenceException(nameof(_TimeReal));}
-            set { _TimeReal = value;  } 
-            }
-        private float? _Temp;
-        public float Temp { 
-            get { return _Temp?? throw new NullReferenceException(nameof(_Temp));}
-            set { _Temp = value;  } 
-            }
-        private float? _WindSpeed;
-        public float WindSpeed { 
-            get { return _WindSpeed?? throw new NullReferenceException(nameof(_WindSpeed));}
-            set { _WindSpeed = value;  } 
-            }
-        private float? _Humidity;
-        public float Humidity { 
-            get { return _Humidity?? throw new NullReferenceException(nameof(_Humidity));}
-            set { _Humidity = value;  } 
-            }
-        private float? _WindDirection;
-        public float WindDirection { 
-            get { return _WindDirection?? throw new NullReferenceException(nameof(_WindDirection));}
-            set { _WindDirection = value;  } 
-            }
+    public readonly struct Point {
+        public readonly TimeSpan TimeUtc { get; }
+        public readonly float Temp { get; }
+        public readonly float WindSpeed { get; }
+        public readonly float Humidity  { get; }
+        public readonly float WindDirection { get; }
 
-        public Point(long timeReal, float temp, float windSpeed, float humidity, float windDirection) : this() {
-            TimeReal = timeReal;
+        public Point(TimeSpan timeUtc, float temp, float windSpeed, float humidity, float windDirection) : this() {
+            TimeUtc = timeUtc;
             Temp = temp;
             WindSpeed = windSpeed;
             Humidity = humidity;

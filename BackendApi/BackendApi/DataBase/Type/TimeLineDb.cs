@@ -8,7 +8,7 @@ namespace BackendApi.DataBase.Type {
     public abstract class TimeLineDb {
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public ObjectId _id { get; set; }
-        public System.DateTime DateTime { get; set; }
+        public DateTime CreateTime { get; set; }
         public float Temp { get; set; }
         public float WindSpeed { get; set; }
         public float Humidity { get; set; }
@@ -19,7 +19,7 @@ namespace BackendApi.DataBase.Type {
             timeLineArr = timeLineArr.Where(x => !x.DeadValue).ToArray();
 
             return new U {
-                DateTime = newDateTime,
+                CreateTime = newDateTime,
                 Humidity = timeLineArr.Length == 0 ? 0 : MathF.Round(timeLineArr.Average(x => x.Humidity), 4),
                 Temp = timeLineArr.Length == 0 ? 0 : MathF.Round(timeLineArr.Average(x => x.Temp), 4),
                 WindDirection = timeLineArr.Length == 0 ? 0 : MathF.Round(timeLineArr.Average(x => x.WindDirection), 4),
@@ -34,7 +34,7 @@ namespace BackendApi.DataBase.Type {
             return new TimeLine5sek {
                 Humidity = point.Humidity,
                 Temp = point.Temp,
-                DateTime = new DateTime(point.TimeReal),
+                CreateTime = new DateTime(point.TimeUtc.Ticks, DateTimeKind.Utc),
                 WindDirection = point.WindDirection,
                 WindSpeed = point.WindSpeed,
                 DeadValue = false
@@ -46,7 +46,7 @@ namespace BackendApi.DataBase.Type {
             return new TimeLine1min {
                 Humidity = point.Humidity,
                 Temp = point.Temp,
-                DateTime = new DateTime(point.TimeReal),
+                CreateTime = new DateTime(point.TimeUtc.Ticks, DateTimeKind.Utc),
                 WindDirection = point.WindDirection,
                 WindSpeed = point.WindSpeed,
                 DeadValue = false
@@ -58,7 +58,7 @@ namespace BackendApi.DataBase.Type {
             return new TimeLine1h {
                 Humidity = point.Humidity,
                 Temp = point.Temp,
-                DateTime = new DateTime(point.TimeReal),
+                CreateTime = new DateTime(point.TimeUtc.Ticks, DateTimeKind.Utc),
                 WindDirection = point.WindDirection,
                 WindSpeed = point.WindSpeed,
                 DeadValue = false
@@ -70,7 +70,7 @@ namespace BackendApi.DataBase.Type {
             return new TimeLine1day {
                 Humidity = point.Humidity,
                 Temp = point.Temp,
-                DateTime = new DateTime(point.TimeReal),
+                CreateTime = new DateTime(point.TimeUtc.Ticks, DateTimeKind.Utc),
                 WindDirection = point.WindDirection,
                 WindSpeed = point.WindSpeed,
                 DeadValue = false
@@ -80,7 +80,7 @@ namespace BackendApi.DataBase.Type {
 
     public class Acc {
         // ReSharper disable once InconsistentNaming
-        [BsonId] public ObjectId _Id { get; set; }
+        [BsonId] public ObjectId _id { get; set; }
         public string? UsernameHash { get; set; }
         public string? PasswdHash { get; set; }
     }

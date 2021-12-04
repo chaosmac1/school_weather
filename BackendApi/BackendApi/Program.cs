@@ -9,7 +9,7 @@ namespace BackendApi {
             
             var (syncManger, syncMangerTask) = SyncManger.FactoryStart(5000);
             var iotServerTask = new IOTServer.IotServer(new IOTServer.IotServer.IotServerProps {
-                Ipv4 = "192.168.2.21",
+                Ipv4 = "127.0.0.1",
                 Port = 3380,
                 AllowKeys = new[] {"BrotMot"},
                 MaxClients = 2,

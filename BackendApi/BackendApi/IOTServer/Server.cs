@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using BackendApi.Ulitis;
+using Microsoft.AspNetCore.Routing.Template;
 using Newtonsoft.Json;
 
 namespace BackendApi.IOTServer {
@@ -69,15 +70,15 @@ namespace BackendApi.IOTServer {
                     SendErrCloseOrThrowInDebug(client, error, "Key not Same");
                     break;
                 } 
-                    
-                var pushTask = _pushStream.PushAsync(new Point() {
-                    TimeReal = DateTime.Now.Ticks,
-                    Humidity = iotTimeData.Humidity,
-                    Temp = iotTimeData.Temp,
-                    WindDirection = iotTimeData.WindDirection,
-                    WindSpeed = iotTimeData.WindSpeed
-                });
-
+                
+                var pushTask = _pushStream.PushAsync(new Point(
+                    timeUtc: new TimeSpan(DateTime.UtcNow.Ticks),
+                    temp: iotTimeData.Temp, 
+                    windSpeed: iotTimeData.WindSpeed, 
+                    humidity: iotTimeData.Humidity,
+                    windDirection: iotTimeData.WindDirection
+                    ));
+                
                 if (!client.SendString(ok)) {
                     pushTask.Wait();
                     ThrowError("client.SendString()");

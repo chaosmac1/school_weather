@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendApi.Controllers;
 using BackendApi.DataBase.Type;
 using BackendApi.Ulitis;
 using MongoDB.Driver;
@@ -11,8 +12,9 @@ namespace BackendApi.DataBase {
         private RopeColl _ropeColl;
         private readonly IWaitPop<Point?> _popWait;
         private bool _firstValuesExist;
-
+        private readonly string _url;
         public Rope(string url, string passwd, IWaitPop<Point?> popWait) {
+            _url = url;
             _popWait = popWait;
             _ropeColl = new RopeColl(url);
         }
@@ -22,7 +24,10 @@ namespace BackendApi.DataBase {
             return (rope, rope.Start());
         }
 
-        public Task Start() => Task.Run(LoopFunc);
+        public Task Start() => Task.Run(() => {
+            _ropeColl.CreateColl();
+            LoopFunc();
+        });
 
         private void LoopFunc() {
             while (true) {
@@ -113,10 +118,9 @@ namespace BackendApi.DataBase {
                 return true;
             }
 
-            var now = new TimeSpan(DateTime.Now.ToUniversalTime().Ticks);
-            var uLastUT = new TimeSpan(uLast.DateTime.ToUniversalTime().Ticks);
-            var diff = uLastUT.Add(timeLineRange).Subtract(now);
-                
+            var now = new TimeSpan(DateTime.UtcNow.Ticks);
+            var diff = uLast.CreateTime.Add(timeLineRange).Subtract(now);
+
             Console.WriteLine($"lower: {uLast} now: {now} Type: {typeof(U)} lower > now: {diff.Ticks > 0}");
             if (diff.Ticks > 0) {
                 canInsert = false;
@@ -124,22 +128,22 @@ namespace BackendApi.DataBase {
             }
 
 
-            if (!_ropeColl.FindDocsInRange<T>(uLast.DateTime.AddTicks(1),
-                uLast.DateTime.Add(timeLineRange), out var timeLineTs)) {
+            if (!_ropeColl.FindDocsInRange<T>(new TimeSpan(uLast.CreateTime.Add(new TimeSpan(TimeSpan.TicksPerSecond)).Ticks),
+                new TimeSpan(uLast.CreateTime.Add(timeLineRange).Ticks), out var timeLineTs)) {
                 canInsert = false;
                 return ThrowErr(nameof(_ropeColl.FindDocsInRange) + "Error");
             }
                 
             
-            var insertValue = TimeLineDb.Average<T, U>(uLast.DateTime.Add(timeLineRange), timeLineTs);
+            var insertValue = TimeLineDb.Average<T, U>(uLast.CreateTime.Add(timeLineRange), timeLineTs);
 
             canInsert = true;
             return InsertNextValueInDb(insertValue);
         }
 
-        private static TimeSpan _UpdateAll1min = new (new DateTime(0).AddMinutes(1).Ticks); 
-        private static TimeSpan _UpdateAll1h = new (new DateTime(0).AddHours(1).Ticks); 
-        private static TimeSpan _UpdateAll1Day = new (new DateTime(0).AddDays(1).Ticks); 
+        private static TimeSpan _UpdateAll1min = new(TimeSpan.TicksPerMinute);
+        private static TimeSpan _UpdateAll1h = new(TimeSpan.TicksPerHour);
+        private static TimeSpan _UpdateAll1Day = new(TimeSpan.TicksPerDay); 
         private bool UpdateAll() {
             bool UpdateLoop<T, U>(TimeSpan rangeTimeSpan) where T : TimeLineDb, new() where U : TimeLineDb, new() {
                 while (true) {

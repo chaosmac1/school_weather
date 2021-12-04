@@ -19,7 +19,8 @@ interface IXY {
 interface IPropsSITimeLines {
     width: string,
     updateSpeedInMsg: number,
-    children: React.ReactNode
+    children: React.ReactNode,
+    hardSetTime: { start: Date, end: Date, diff: string } | undefined | null
 }
 
 interface IStateSITimeLines {
@@ -44,8 +45,20 @@ export class SITimeLines extends React.Component<IPropsSITimeLines, IStateSITime
     componentDidMount() { this.update() }
 
     private async update() {
-        var timeDate = new Date();
-        const fromDb = await getTimeLineAll(dateToTicks(timeDate), dateToTicks(timeDate) + (TicksPerHour * 2));
+        let fromDb: ITimeLineAll;
+        if (this.props.hardSetTime !== undefined && this.props.hardSetTime !== null) {
+            const time: { start: Date; end: Date; diff: string } = this.props.hardSetTime;
+            fromDb = await getTimeLineAll({
+                startTime: time.start,
+                endTime: time.end,
+                timeValue: time.diff,
+                timezoneOffset: Math.trunc(time.start.getTimezoneOffset() / 60)
+            });
+        } else {
+            const timeDate = new Date();
+            fromDb = await getTimeLineAll(dateToTicks(timeDate), dateToTicks(timeDate) + (TicksPerHour * 2));
+        }
+
         this.setState({
             temp: fromDb.temp,
             windSpeed: fromDb.windSpeed,

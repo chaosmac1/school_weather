@@ -4,6 +4,7 @@ using MongoDB.Driver;
 
 namespace BackendApi.DataBase {
     public struct RopeColl {
+        private readonly string _url;
         private readonly IMongoCollection<TimeLine1day> _collTimeLine1day;
         private readonly IMongoCollection<TimeLine1h> _collTimeLine1H;
         private readonly IMongoCollection<TimeLine1min> _collTimeLine1Min;
@@ -14,6 +15,7 @@ namespace BackendApi.DataBase {
         private readonly System.Type _typeTimeLine1h;
         private readonly System.Type _typeTimeLine1day;
         public RopeColl(string url) {
+            _url = url;
             _collTimeLine5Sek = GetCol.GetTimeLine5sek(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
             _collTimeLine1Min = GetCol.GetTimeLine1min(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
             _collTimeLine1H = GetCol.GetTimeLine1h(url) ?? throw new NullReferenceException("Connect To MongoDb Is Null");
@@ -38,7 +40,7 @@ namespace BackendApi.DataBase {
         internal bool GetLastDoc<T>(out T? lastDoc, IMongoCollection<T> db) where T : TimeLineDb {
             try {
                 lastDoc = db.FindSync(Builders<T>.Filter.Exists(x => x._id), new FindOptions<T> {
-                    Sort = Builders<T>.Sort.Descending(x => x.DateTime)
+                    Sort = Builders<T>.Sort.Descending(x => x.CreateTime)
                 }).FirstOrDefault();
                 return true;
             }
@@ -54,11 +56,11 @@ namespace BackendApi.DataBase {
             return true;
         }
 
-        internal bool FindDocsInRange<T>(DateTime dateTimeStart, DateTime dateTimeEnd, out T[] timeLineDbs) where T : TimeLineDb {
+        internal bool FindDocsInRange<T>(TimeSpan timeSpanStart, TimeSpan timeSpanEnd, out T[] timeLineDbs) where T : TimeLineDb {
             try {
                 timeLineDbs = GetColl<T>().FindSync(
-                    Builders<T>.Filter.Gte(x => x.DateTime, dateTimeStart) &
-                    Builders<T>.Filter.Lt(x => x.DateTime, dateTimeEnd)).ToList().ToArray();
+                    Builders<T>.Filter.Gte(x => x.CreateTime, new DateTime(timeSpanStart.Ticks, DateTimeKind.Utc)) &
+                    Builders<T>.Filter.Lt(x => x.CreateTime, new DateTime(timeSpanStart.Ticks, DateTimeKind.Utc))).ToList().ToArray();
                 return true;
             }
             catch (Exception) {
@@ -66,7 +68,25 @@ namespace BackendApi.DataBase {
                 return false;
             }
         }
-        
+
+        internal bool CreateColl() {
+            try {
+                var client = new MongoClient(_url).GetDatabase(GetCol.DataBaseName.TimeLine);
+                client.CreateCollection(GetCol.CollationName.TimeLine5Sek, new CreateCollectionOptions());
+                client.RunCommand<string>($"db.getCollection(\"{GetCol.CollationName.TimeLine5Sek}\")" + ".createIndex({\"CreateTime\":1, \"_id\":1},{unique: true,sparse: true,expireAfterSeconds: 600})");
+                client.RunCommand<string>($"db.getCollection(\"{GetCol.CollationName.TimeLine1Min}\")" + ".createIndex({\"CreateTime\":1, \"_id\":1},{unique: true,sparse: true,expireAfterSeconds: 600})");
+                client.RunCommand<string>($"db.getCollection(\"{GetCol.CollationName.TimeLine1day}\")" + ".createIndex({\"CreateTime\":1, \"_id\":1},{unique: true,sparse: true,expireAfterSeconds: 86400})");
+            }
+#if DEBUG
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;
+            }
+#else
+            catch (Exception e) { return false; }
+#endif
+            return true;
+        }
         private static bool ThrowErr(string msg) {
 #if DEBUG
             throw new Exception(msg);
