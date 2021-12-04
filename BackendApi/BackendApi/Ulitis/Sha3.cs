@@ -1,44 +1,43 @@
-using System;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 
-namespace BackendApi.Ulitis {
-    public static class Sha3 {
-        public static string GetSha3Ascii(string msg) {
-            var hashAlgo = new Sha3Digest(512);
+namespace BackendApi.Ulitis; 
 
-            var input = Encoding.ASCII.GetBytes(msg);
+public static class Sha3 {
+    public static string GetSha3Ascii(string msg) {
+        var hashAlgo = new Sha3Digest(512);
 
-            hashAlgo.BlockUpdate(input, 0, input.Length);
+        var input = Encoding.ASCII.GetBytes(msg);
 
-            var result = new byte[512 / 8];
-            hashAlgo.DoFinal(result, 0);
+        hashAlgo.BlockUpdate(input, 0, input.Length);
 
-            return BitConverter.ToString(result).Replace("-", "").ToLowerInvariant();
-        }
+        var result = new byte[512 / 8];
+        hashAlgo.DoFinal(result, 0);
 
-        public static string GetSha3Utf8(string msg) {
-            var hashAlgo = new Sha3Digest(512);
+        return BitConverter.ToString(result).Replace("-", "").ToLowerInvariant();
+    }
 
-            var input = Encoding.UTF8.GetBytes(msg);
+    public static string GetSha3Utf8(string msg) {
+        var hashAlgo = new Sha3Digest(512);
 
-            hashAlgo.BlockUpdate(input, 0, input.Length);
+        var input = Encoding.UTF8.GetBytes(msg);
 
-            var result = new byte[512 / 8];
-            hashAlgo.DoFinal(result, 0);
+        hashAlgo.BlockUpdate(input, 0, input.Length);
 
-            return BitConverter.ToString(result).Replace("-", "").ToLowerInvariant();
-        }
+        var result = new byte[512 / 8];
+        hashAlgo.DoFinal(result, 0);
 
-        public static string GetSha3Byte(byte[] input) {
-            var hashAlgo = new Sha3Digest(512);
+        return BitConverter.ToString(result).Replace("-", "").ToLowerInvariant();
+    }
 
-            hashAlgo.BlockUpdate(input, 0, input.Length);
+    public static string GetSha3Byte(byte[] input) {
+        var hashAlgo = new Sha3Digest(512);
 
-            var result = new byte[512 / 8];
-            hashAlgo.DoFinal(result, 0);
+        hashAlgo.BlockUpdate(input, 0, input.Length);
 
-            return BitConverter.ToString(result).Replace("-", "").ToLowerInvariant();
-        }
+        var result = new byte[512 / 8];
+        hashAlgo.DoFinal(result, 0);
+
+        return BitConverter.ToString(result).Replace("-", "").ToLowerInvariant();
     }
 }

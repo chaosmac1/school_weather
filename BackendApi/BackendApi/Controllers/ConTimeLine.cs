@@ -2,17 +2,10 @@
 //#define TEST
 #endif
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using BackendApi.DataBase;
 using BackendApi.DataBase.Type;
-using BackendApi.ExtensionMethod;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using Time = Org.BouncyCastle.Asn1.X509.Time;
 
 namespace BackendApi.Controllers {
     [ApiController]
@@ -140,13 +133,13 @@ namespace BackendApi.Controllers {
         private bool GetTimeLineFromServer(TimeSpan startTime, TimeSpan endTime, ETimeStamp timeValue, out List<TimeLineDb> res) {
             List<TimeLineDb>? fromDb = null;
             if (timeValue == ETimeStamp.FiveSek)
-                GetFromServer<TimeLine5sek, TimeLineDb>(startTime, endTime, out fromDb);
+                GetFromServer<TimeLine5Sek, TimeLineDb>(startTime, endTime, out fromDb);
             else if (timeValue == ETimeStamp.OneMin)
-                GetFromServer<TimeLine1min, TimeLineDb>(startTime, endTime, out fromDb);
+                GetFromServer<TimeLine1Min, TimeLineDb>(startTime, endTime, out fromDb);
             else if (timeValue == ETimeStamp.OneH)
-                GetFromServer<TimeLine1h, TimeLineDb>(startTime, endTime, out fromDb);
+                GetFromServer<TimeLine1H, TimeLineDb>(startTime, endTime, out fromDb);
             else if (timeValue == ETimeStamp.OneDay)
-                GetFromServer<TimeLine1day, TimeLineDb>(startTime, endTime, out fromDb);
+                GetFromServer<TimeLine1Day, TimeLineDb>(startTime, endTime, out fromDb);
             else {
                 res = new List<TimeLineDb>();
                 return ThrowErr("timeValue Enum Type Not Found");
