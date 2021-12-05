@@ -4,19 +4,11 @@
     <list default="true" id="114b03ae-874d-48ad-96f3-8df5ec849eb7" name="Changes" comment="frontend start write settings">
       <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLine.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLineObjcs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLineObjcs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Rope.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Rope.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/RopeColl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/RopeColl.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine1Day.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine1Day.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine1H.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine1H.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine1Min.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine1Min.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine5Sek.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLine5Sek.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLineDb.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/DataBase/Type/TimeLineDb.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/Ulitis/DateFixer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/Ulitis/DateFixer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rev-send/get-time-line.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rev-send/get-time-line.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/public/private/radar-chart.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/public/private/radar-chart.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/template/private/single-set-time.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/private/single-set-time.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/template/public/private/time-line.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/public/private/time-line.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/public/single-time-lines.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/public/single-time-lines.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/template/public/single-time-lines.tsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/template/template-main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/template-main.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -34,6 +26,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -55,7 +55,7 @@
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -101,7 +101,7 @@
       <workItem from="1638180449812" duration="831000" />
       <workItem from="1638518944732" duration="1953000" />
       <workItem from="1638558648568" duration="3011000" />
-      <workItem from="1638712073838" duration="3922000" />
+      <workItem from="1638712073838" duration="22361000" />
     </task>
     <task id="LOCAL-00001" summary="start write on frontend">
       <created>1631404066913</created>

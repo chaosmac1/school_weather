@@ -5,6 +5,7 @@
 using BackendApi.DataBase;
 using BackendApi.DataBase.Type;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
@@ -43,6 +44,8 @@ namespace BackendApi.Controllers {
                 return new ConTimeLineObj.TsTimeLineAll();
             }
             
+            // TODO Remove
+            Console.WriteLine("Send Array Count:" + timeLineDbs.Count);
             return new ConTimeLineObj.TsTimeLineAll {
                 Humidity = ConTimeLineObj.TsTimeLine.FactoryHumidity(timeLineDbs, timezoneOffset),
                 Temp = ConTimeLineObj.TsTimeLine.FactoryTemp(timeLineDbs, timezoneOffset),

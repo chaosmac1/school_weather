@@ -1,5 +1,3 @@
-import {SITimeLines} from "../template/public/single-time-lines";
-
 export interface IPoint {
     pointId: number;
     value: number;
@@ -26,6 +24,8 @@ export interface ITimeLineAll {
 
 export async function getTimeLineAll(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<ITimeLineAll> {
     const sendString = "https://localhost:5002/ConTimeLine/all" + setParas(props);
+
+    console.log("brrr", sendString)
 
     let res: ITimeLineAll | null | undefined =  await (await fetch(sendString)).json();
 
@@ -90,9 +90,9 @@ function dateToISOString(date: Date): string {
     }
 
     return date.getUTCFullYear() +
-        pad(date.getUTCMonth() + 1) +
-        pad(date.getUTCDate()) + 'T' +
-        pad(date.getUTCHours()) + ':' +
-        pad(date.getUTCMinutes()) + ':' +
-        pad(date.getUTCSeconds()) + 'Z';
+        pad(date.getMonth() +1) +
+        pad(date.getDate()) + 'T' +
+        pad(date.getHours()) + ':' +
+        pad(date.getMinutes()) + ':' +
+        pad(date.getSeconds()) + 'Z';
 };

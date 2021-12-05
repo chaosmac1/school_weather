@@ -96,7 +96,8 @@ public class ConTimeLineObj {
             public Point(TimeSpan date, float value, int timezoneOffset) {
                 PointId = date.Ticks;
                 Value = value;
-                Date = new DateTimeOffset(date.Ticks, new TimeSpan(timezoneOffset)).ToDateTimeUtcPlusOffset().ToString();
+                var offset = new TimeSpan(TimeSpan.TicksPerHour * timezoneOffset);
+                Date = new DateTimeOffset(date.Ticks, offset).ToDateTimeUtcPlusOffset().ToString();
             }
         }
     }
