@@ -55,8 +55,14 @@ export class SITimeLines extends React.Component<IPropsSITimeLines, IStateSITime
                 timezoneOffset: Math.trunc(time.start.getTimezoneOffset() / 60)
             });
         } else {
-            const timeDate = new Date();
-            fromDb = await getTimeLineAll(dateToTicks(timeDate), dateToTicks(timeDate) + (TicksPerHour * 2));
+            const now = new Date();
+            const dayBefore = new Date(now.getTime() - (1000*60*60*24))
+            fromDb = await getTimeLineAll({
+                startTime: dayBefore,
+                endTime: now,
+                timeValue: "fiveSek",
+                timezoneOffset: 0
+            });
         }
 
         this.setState({

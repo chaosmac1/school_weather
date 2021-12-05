@@ -25,7 +25,9 @@ public static class DateFixer {
         var hour = int.Parse(time.Substring(9, 2));
         var min = int.Parse(time.Substring(12, 2));
         var sek = int.Parse(time.Substring(15, 2));
-            
-        return new TimeSpan(new DateTime(year, month, day, hour, min, sek, DateTimeKind.Utc).Ticks);
+
+        var dateTime = new DateTime(year, month, day, hour, min, sek, DateTimeKind.Utc);
+        var tick = dateTime.Ticks;
+        return new TimeSpan(tick);
     }
 }

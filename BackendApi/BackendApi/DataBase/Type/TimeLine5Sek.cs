@@ -5,7 +5,7 @@ public class TimeLine5Sek : TimeLineDb {
         return new TimeLine5Sek {
             Humidity = point.Humidity,
             Temp = point.Temp,
-            CreateTime = new DateTime(point.TimeUtc.Ticks, DateTimeKind.Utc),
+            CreateTime = point.TimeUtc.Ticks,
             WindDirection = point.WindDirection,
             WindSpeed = point.WindSpeed,
             DeadValue = false

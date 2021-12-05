@@ -59,8 +59,8 @@ public struct RopeColl {
     internal bool FindDocsInRange<T>(TimeSpan timeSpanStart, TimeSpan timeSpanEnd, out T[] timeLineDbs) where T : TimeLineDb {
         try {
             timeLineDbs = GetColl<T>().FindSync(
-                Builders<T>.Filter.Gte(x => x.CreateTime, new DateTime(timeSpanStart.Ticks, DateTimeKind.Utc)) &
-                Builders<T>.Filter.Lt(x => x.CreateTime, new DateTime(timeSpanStart.Ticks, DateTimeKind.Utc))).ToList().ToArray();
+                Builders<T>.Filter.Gte(x => x.CreateTime, timeSpanStart.Ticks) &
+                Builders<T>.Filter.Lt(x => x.CreateTime, timeSpanEnd.Ticks)).ToList().ToArray();
             return true;
         }
         catch (Exception) {
@@ -70,21 +70,26 @@ public struct RopeColl {
     }
 
     internal bool CreateColl() {
-        try {
-            var client = new MongoClient(_url).GetDatabase(GetCol.DataBaseName.TimeLine);
-            client.CreateCollection(GetCol.CollationName.TimeLine5Sek, new CreateCollectionOptions());
-            client.RunCommand<string>($"db.getCollection(\"{GetCol.CollationName.TimeLine5Sek}\")" + ".createIndex({\"CreateTime\":1, \"_id\":1},{unique: true,sparse: true,expireAfterSeconds: 600})");
-            client.RunCommand<string>($"db.getCollection(\"{GetCol.CollationName.TimeLine1Min}\")" + ".createIndex({\"CreateTime\":1, \"_id\":1},{unique: true,sparse: true,expireAfterSeconds: 600})");
-            client.RunCommand<string>($"db.getCollection(\"{GetCol.CollationName.TimeLine1day}\")" + ".createIndex({\"CreateTime\":1, \"_id\":1},{unique: true,sparse: true,expireAfterSeconds: 86400})");
-        }
+        static bool MakeKey<T>(RopeColl ropeColl) where T : TimeLineDb {
+            try {
+                ropeColl.GetColl<T>().Indexes.CreateOne(Builders<T>.IndexKeys.Combine(
+                    Builders<T>.IndexKeys.Ascending(f => f.CreateTime)));
+            }
 #if DEBUG
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;
+            }
 #else
             catch (Exception e) { return false; }
 #endif
+            return true;
+        }
+
+        if (!MakeKey<TimeLine5Sek>(this)) return false;
+        if (!MakeKey<TimeLine1Min>(this)) return false;
+        if (!MakeKey<TimeLine1H>(this)) return false;
+        if (!MakeKey<TimeLine1Day>(this)) return false;
         return true;
     }
     private static bool ThrowErr(string msg) {

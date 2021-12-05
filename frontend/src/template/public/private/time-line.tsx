@@ -26,6 +26,7 @@ export class TimeLine extends React.Component<IPropsTimeLine, IStateTimeLine> {
 
     render() {
         console.log("ooo", this.props.timeLine.points);
+
         return (
             <div style={{width:"calc(100% - 30px)", height: this.props.height}}>
                 <ResponsiveContainer width={"100%"} height={this.props.height - 20}>

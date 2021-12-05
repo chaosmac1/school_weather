@@ -3,7 +3,7 @@ import {SITimeLines} from "../template/public/single-time-lines";
 export interface IPoint {
     pointId: number;
     value: number;
-    date: string | number;
+    date: string;
 }
 
 export interface ITimeLine {
@@ -38,10 +38,6 @@ export async function getTimeLineAll(props: {startTime: Date, endTime: Date, tim
         }
     }
 
-    pointNumbersToNumber(res.temp);
-    pointNumbersToNumber(res.windSpeed);
-    pointNumbersToNumber(res.humidity);
-
     return res;
 }
 
@@ -51,7 +47,7 @@ export async function getTemp(props: {startTime: Date, endTime: Date, timeValue:
 
     if (res === null || res === undefined) return { points: [] };
 
-    return pointNumbersToNumber(res);
+    return res;
 }
 
 export async function getWindSpeed(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<ITimeLine> {
@@ -60,7 +56,7 @@ export async function getWindSpeed(props: {startTime: Date, endTime: Date, timeV
 
     if (res === null || res === undefined) return { points: [] };
 
-    return pointNumbersToNumber(res);
+    return res;
 }
 
 export async function getWind(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<IRadarChart> {
@@ -78,17 +74,25 @@ export async function getHumidity(props: {startTime: Date, endTime: Date, timeVa
 
     if (res === null || res === undefined) return { points: [] };
 
-    return pointNumbersToNumber(res);
+    return res;
 }
 
 function setParas(paras: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): string {
-    return "?startTime=" + paras.startTime +
-        "&endTime=" + paras.endTime +
+    return "?startTime=" + dateToISOString(paras.startTime) +
+        "&endTime=" + dateToISOString(paras.endTime) +
         "&timeValue=" + paras.timeValue +
         "&timezoneOffset=" + paras.timezoneOffset;
 }
 
-function pointNumbersToNumber(arr: ITimeLine): ITimeLine {
-    arr.points.forEach(x => { x.date = Date.parse(x.date as string).valueOf() })
-    return arr;
-}
+function dateToISOString(date: Date): string {
+    function pad(number: number) {
+        return number < 10 ? '0' + number : number.toString();
+    }
+
+    return date.getUTCFullYear() +
+        pad(date.getUTCMonth() + 1) +
+        pad(date.getUTCDate()) + 'T' +
+        pad(date.getUTCHours()) + ':' +
+        pad(date.getUTCMinutes()) + ':' +
+        pad(date.getUTCSeconds()) + 'Z';
+};

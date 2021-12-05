@@ -5,6 +5,8 @@
 using BackendApi.DataBase;
 using BackendApi.DataBase.Type;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace BackendApi.Controllers {
@@ -160,8 +162,8 @@ namespace BackendApi.Controllers {
             if (db is null) return false;
 
             res = db.FindSync(
-                Builders<T>.Filter.Gte(x => x.CreateTime, new DateTime(tickStart.Ticks, DateTimeKind.Utc)) &
-                Builders<T>.Filter.Lt(x => x.CreateTime, new DateTime(tickEnd.Ticks, DateTimeKind.Utc)),
+                Builders<T>.Filter.Gte(x => x.CreateTime, tickStart.Ticks) &
+                Builders<T>.Filter.Lt(x => x.CreateTime, tickEnd.Ticks),
                 new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.CreateTime)}
             ).ToEnumerable().ToList();
             return true;
@@ -172,13 +174,11 @@ namespace BackendApi.Controllers {
             res = new List<U>();
             if (db is null) return false;
 
-            var start = new DateTime(tickStart.Ticks, DateTimeKind.Utc);
-            var end = new DateTime(tickEnd.Ticks, DateTimeKind.Utc);
-            res = db.FindSync(
-                Builders<T>.Filter.Gte(x => x.CreateTime, new DateTime(tickStart.Ticks, DateTimeKind.Utc)) &
-                Builders<T>.Filter.Lt(x => x.CreateTime, new DateTime(tickEnd.Ticks, DateTimeKind.Utc)),
-                new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.CreateTime)}
-            ).ToEnumerable().ToList() as List<U>;
+            var builder = Builders<T>.Filter;
+            var findBy = builder.Gte(x => x.CreateTime, tickStart.Ticks) & builder.Lte(x => x.CreateTime, tickEnd.Ticks);
+            var sort = new FindOptions<T> {Sort = Builders<T>.Sort.Ascending(x => x.CreateTime)};
+            res = (from i in db.FindSync(findBy, sort).ToEnumerable() select i as U).ToList();
+            
             return true;
         }
 

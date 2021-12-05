@@ -5,7 +5,7 @@ public class TimeLine1Day : TimeLineDb {
         return new TimeLine1Day {
             Humidity = point.Humidity,
             Temp = point.Temp,
-            CreateTime = new DateTime(point.TimeUtc.Ticks, DateTimeKind.Utc),
+            CreateTime = point.TimeUtc.Ticks,
             WindDirection = point.WindDirection,
             WindSpeed = point.WindSpeed,
             DeadValue = false

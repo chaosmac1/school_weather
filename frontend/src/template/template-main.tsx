@@ -25,11 +25,12 @@ export class TSMain extends React.Component<IPropsTSMain, IStateTSMain> {
 
 
     private divTimeline(width: string) : JSX.Element {
-        return (<SITimeLines updateSpeedInMsg={5000} width={width}>
-            <div style={{minWidth: "calc(100vw - " + width + "px)"}}>
-                <SISetTime main={this.state}/>
-            </div>
-        </SITimeLines>);
+        return (
+            <SITimeLines updateSpeedInMsg={5000} width={width} hardSetTime={null}>
+                <div style={{minWidth: "calc(100vw - " + width + "px)"}}>
+                    <SISetTime main={this.state}/>
+                </div>
+            </SITimeLines>);
     }
 
     private divHeader(width: string) : JSX.Element {

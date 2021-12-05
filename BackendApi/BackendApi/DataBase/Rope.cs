@@ -27,7 +27,7 @@ public class Rope {
         while (true) {
             var nextPoint = _popWait.Pop();
             if (nextPoint is null) continue;
-
+            var ss = new DateTime(nextPoint.Value.TimeUtc.Ticks, DateTimeKind.Utc);
             if (_firstValuesExist == false) {
                 if (!_ropeColl.FirstValueExistInDb<TimeLine5Sek>(out _firstValuesExist)) {
                     ThrowErr("Try To Check If First Value Exist");
@@ -54,7 +54,8 @@ public class Rope {
 
     private bool InsertPointIn5Sek(Point point) {
         try {
-            _ropeColl.GetColl<TimeLine5Sek>().InsertOne((TimeLine5Sek)point);
+            var timeLine = (TimeLine5Sek) point;
+            _ropeColl.GetColl<TimeLine5Sek>().InsertOne(timeLine);
             return true;
         }
 #if DEBUG
@@ -87,12 +88,12 @@ public class Rope {
         
     /// <summary>  </summary>
     /// <param name="timeLineRange"></param>
-    /// <typeparam name="T"> Lower Time Line </typeparam>
-    /// <typeparam name="U"> Higher Time Line </typeparam>
+    /// <typeparam name="TLow"> Lower Time Line </typeparam>
+    /// <typeparam name="UHigh"> Higher Time Line </typeparam>
     /// <returns> Error == true </returns>
-    private bool Update<T, U>(TimeSpan timeLineRange, out bool canInsert) where T : TimeLineDb, new() where U : TimeLineDb, new() {
+    private bool Update<TLow, UHigh>(TimeSpan timeLineRange, out bool canInsert) where TLow : TimeLineDb, new() where UHigh : TimeLineDb, new() {
 
-        if (!_ropeColl.GetLastDoc<T>(out var tLast)) {
+        if (!_ropeColl.GetLastDoc<TLow>(out var tLast)) {
             canInsert = false;
             return ThrowErr( $"{nameof(tLast)} is null");
         }
@@ -102,7 +103,7 @@ public class Rope {
             return true;
         }
 
-        if (!_ropeColl.GetLastDoc<U>(out var uLast)) {
+        if (!_ropeColl.GetLastDoc<UHigh>(out var uLast)) {
             canInsert = false;
             return ThrowErr($"{nameof(uLast)} is null");
         }
@@ -112,24 +113,25 @@ public class Rope {
             return true;
         }
 
-        var now = new TimeSpan(DateTime.UtcNow.Ticks);
-        var diff = uLast.CreateTime.Add(timeLineRange).Subtract(now);
-
-        Console.WriteLine($"lower: {uLast} now: {now} Type: {typeof(U)} lower > now: {diff.Ticks > 0}");
-        if (diff.Ticks > 0) {
+        var now = tLast.CreateTime;
+        
+        var diff = now - (uLast.CreateTime + timeLineRange.Ticks);
+        
+        Console.WriteLine($"lower: {uLast.CreateTime} now: {new DateTime(now, DateTimeKind.Unspecified)} Type: {typeof(UHigh)} low > high: {diff > 0}");
+        if (diff < 0) {
             canInsert = false;
             return true;
         }
 
-
-        if (!_ropeColl.FindDocsInRange<T>(new TimeSpan(uLast.CreateTime.Add(new TimeSpan(TimeSpan.TicksPerSecond)).Ticks),
-                new TimeSpan(uLast.CreateTime.Add(timeLineRange).Ticks), out var timeLineTs)) {
+        var ttStart = new TimeSpan(tLast.CreateTime).Subtract(timeLineRange);
+        var ttEnd = new TimeSpan(tLast.CreateTime);
+        if (!_ropeColl.FindDocsInRange<TLow>(ttStart, ttEnd, out var timeLineTs)) {
             canInsert = false;
             return ThrowErr(nameof(_ropeColl.FindDocsInRange) + "Error");
         }
-                
-            
-        var insertValue = TimeLineDb.Average<T, U>(uLast.CreateTime.Add(timeLineRange), timeLineTs);
+
+        var creteTime = new TimeSpan(uLast.CreateTime + timeLineRange.Ticks);
+        var insertValue = TimeLineDb.Average<TLow, UHigh>(creteTime, timeLineTs);
 
         canInsert = true;
         return InsertNextValueInDb(insertValue);

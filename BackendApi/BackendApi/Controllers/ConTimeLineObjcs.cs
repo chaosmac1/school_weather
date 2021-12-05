@@ -9,22 +9,18 @@ public class ConTimeLineObj {
 
         public Radio[] Radios {
             get => _radios?? throw new NullReferenceException(nameof(_radios));
-            set {
-                if (_radios is null) throw new NullReferenceException(nameof(_radios));
-                _radios = value;
-            }
+            set => _radios = value;
         }
 
         public static TsChart FactoryWindDirection(List<TimeLineDb> list, int timezoneOffset) {
             return new TsChart(
                 windDirePoints: new TsTimeLine() {
-                    Points =
-                        (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime.Ticks), i.WindDirection, timezoneOffset))
-                        .ToArray()
+                    Points = (from i in list select 
+                        new TsTimeLine.Point(new TimeSpan(i.CreateTime), i.WindDirection, timezoneOffset)).ToArray()
                 },
                 windSpeedPoints: new TsTimeLine() {
-                    Points =
-                        (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime.Ticks), i.WindSpeed, timezoneOffset)).ToArray()
+                    Points = (from i in list select 
+                        new TsTimeLine.Point(new TimeSpan(i.CreateTime), i.WindSpeed, timezoneOffset)).ToArray()
                 }
             );
         }
@@ -73,20 +69,20 @@ public class ConTimeLineObj {
         public static TsTimeLine FactoryTemp(List<TimeLineDb> list, int timezoneOffset) {
             return new TsTimeLine {
                 Points =
-                    (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime.Ticks), i.Temp, timezoneOffset)).ToArray()
+                    (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime), i.Temp, timezoneOffset)).ToArray()
             };
         }
 
         public static TsTimeLine FactoryWindSpeed(List<TimeLineDb> list, int timezoneOffset) {
             return new TsTimeLine {
                 Points =
-                    (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime.Ticks), i.WindSpeed, timezoneOffset)).ToArray()
+                    (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime), i.WindSpeed, timezoneOffset)).ToArray()
             };
         }
 
         public static TsTimeLine FactoryHumidity(List<TimeLineDb> list, int timezoneOffset) {
             return new TsTimeLine {Points = 
-                (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime.Ticks), i.Humidity, timezoneOffset)).ToArray()};
+                (from i in list select new TsTimeLine.Point(new TimeSpan(i.CreateTime), i.Humidity, timezoneOffset)).ToArray()};
         }
             
         public class Point {

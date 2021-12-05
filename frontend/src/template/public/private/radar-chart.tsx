@@ -29,6 +29,7 @@ export class SIRadarChart extends React.Component<IPropsSIRadarChart, IStateSIRa
     render() {
         const size = 130;
         console.log("aaa", this.arrayMax(this.props.timeLine.radios));
+
         return (
             <div style={{width: this.props.height +130, height: this.props.height}}>
                 <RadarChart outerRadius={size}
