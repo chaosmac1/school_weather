@@ -1,7 +1,12 @@
 using BackendApi.DataBase;
 using BackendApi.DataBase.Type;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Libmongocrypt;
+using Org.BouncyCastle.Crypto.Tls;
+using Org.BouncyCastle.Utilities;
 
 namespace BackendApi.Controllers; 
 
@@ -12,61 +17,220 @@ public class ConLogin : ControllerBase {
     private static readonly string DefaultPasswordHash = Sha3.GetSha3Utf8("root");
     private readonly ILogger<ConLogin> _logger;
 
-    public ConLogin(ILogger<ConLogin> logger) {
-        _logger = logger;
+    public ConLogin(ILogger<ConLogin> logger) => _logger = logger;
+
+    public class ResponseRes<T> where T: class {
+        public int Response { get; set; }
+        public string? Msg { get; set; }
+        public T? Data { get; set; }
+
+        public static ResponseRes<T> FactoryRight(T? data) {
+            return new ResponseRes<T> {
+                Data = data,
+                Msg = "",
+                Response = StatusCodes.Status200OK
+            };
+        }
     }
 
-    [HttpPost("login")]
-    public TsCookie Login(string? username, string? passwd) {
-        if (string.IsNullOrEmpty(username)) return new TsCookie {Error = true, ErrorMsg = "Username is Null Or Empty"};
-        if (string.IsNullOrEmpty(passwd)) return new TsCookie {Error = true, ErrorMsg = "Password is Null Or Empty"};
-
-        static TsCookie TsCookie500() => new() {Error = true, ErrorMsg = "500"};
-            
-        static TsCookie TsCookie500Err(string msg) {
+    private static (bool Error, string msg) CheckRootUser(string username, string passwd, out (bool UsernameRight, bool PasswordRight) res) {
+        static (bool Error, string msg) ThrowMsg(string msg) {
 #if DEBUG
             throw new Exception(msg);
 #else
-                return TsCookie500();
+            return (true, msg);
 #endif
         }
 
         if (!GetAccount(out var acc))
-            return TsCookie500Err("acc not found");
+            return ThrowMsg("acc not found");
 
         if (acc is null && !CreateDefaultAcc())
-            return TsCookie500Err("CreateDefaultAcc Error");
+            return ThrowMsg("CreateDefaultAcc Error");
 
         if (!GetAccount(out acc))
-            return TsCookie500Err("acc not found");
+            return ThrowMsg("acc not found");
 
         if (acc is null)
-            return TsCookie500Err("CreateDefaultAcc Error");
+            return ThrowMsg("CreateDefaultAcc Error");
 
-        if (acc.UsernameHash != Sha3.GetSha3Utf8(username))
-            return new TsCookie {Error = true, ErrorMsg = "Username Is False"};
+        if (acc.UsernameHash != Sha3.GetSha3Utf8(username)) {
+            res = (false, false);
+            return (false, String.Empty);
+        }
+        
+        if (acc.PasswdHash != Sha3.GetSha3Utf8(passwd)) {
+            res = (true, false);
+            return (false, String.Empty);
+        }
+        
+        res = (true, true);
+        return (false, String.Empty);
+    }
+    
+    public class ResponseResLoginData {
+        public bool UsernameRight { get; set; }
+        public bool PasswordRight { get; set; }
+    }
+    
+    public class LoginBody {
+        public string? Username { get; set; }
+        public string? Passwd { get; set; }
+    }
+    
+    [HttpPost("login")]
+    public ResponseRes<ResponseResLoginData> Login(LoginBody body) {
+        if (string.IsNullOrEmpty(body.Username))
+            return new() {
+                Data = new() {PasswordRight = false, UsernameRight = false},
+                Msg = "Username is Null Or Empty",
+                Response = 200,
+            };
+        if (string.IsNullOrEmpty(body.Passwd))
+            return new() {
+                Data = new() {PasswordRight = false, UsernameRight = false},
+                Msg = "Password is Null Or Empty",
+                Response = 200
+            };
+        
+        static ResponseRes<ResponseResLoginData> Get500() => new() {
+            Data = null,
+            Msg = "Internal Server Error",
+            Response = StatusCodes.Status500InternalServerError
+        };
+            
+        static ResponseRes<ResponseResLoginData> TsCookie500Err(string msg) {
+#if DEBUG
+            throw new Exception(msg);
+#else
+            return TsCookie500();
+#endif
+        }
 
-        if (acc.PasswdHash != Sha3.GetSha3Utf8(passwd))
-            return new TsCookie {Error = true, ErrorMsg = "Password Is False"};
-
-        return new TsCookie {Error = false, Key = PushNewKey()};
+        var resErr = CheckRootUser(body.Username, body.Passwd, out var res);
+        if (resErr.Error) {
+            return new ResponseRes<ResponseResLoginData>() {
+                Data = null,
+                Msg = resErr.msg,
+                Response = 500
+            };
+        }
+        return new ResponseRes<ResponseResLoginData>() {
+            Data = new ResponseResLoginData() {
+                PasswordRight = res.PasswordRight,
+                UsernameRight = res.UsernameRight
+            },
+            Msg = string.Empty,
+            Response = 200
+        };
     }
 
+    public class ResponseResChangePasswd: ResponseResLoginData { }
+    
+    public class ChangePasswdBody {
+        public string? Username { get; set; }
+        public string? OldPasswd { get; set; }
+        public string? NewPasswd { get; set; }
+    }
     [HttpPost("changepasswd")]
-    public bool ChangePasswd(string? key, string? oldPasswd, string? newPasswd) {
-        if (string.IsNullOrEmpty(key)) return ThrowErr("key Is Empty Or Null");
-        if (string.IsNullOrEmpty(oldPasswd)) return ThrowErr("oldPasswd Is Empty Or Null");
-        if (string.IsNullOrEmpty(newPasswd)) return ThrowErr("newPasswd Is Empty Or Null");
+    public ResponseRes<ResponseResChangePasswd> ChangePasswd(ChangePasswdBody body) {
+        var login = Login(
+            new LoginBody() { Passwd = body.OldPasswd, Username = body.Username });
 
-        if (!Cookie.CookieManger.KeyExist(key)) return ThrowErr("key Not Exist");
-        if (!GetAccount(out var acc)) return ThrowErr("Acc Not Found");
-        if (acc!.PasswdHash != Sha3.GetSha3Utf8(oldPasswd)) return ThrowErr("Password Is False");
+        static ResponseRes<ResponseResChangePasswd> ThrowMsg(string msg) {
+#if DEBUG
+            throw new Exception(msg);
+#else
+            return new ResponseRes<ResponseResChangePasswd>() {
+                Data = null,
+                Msg = msg,
+                Response = 500
+            };
+#endif
+        }
+        
+        if (login.Response != 200 || login.Data is null || !login.Data.PasswordRight || !login.Data.UsernameRight) {
+            return new ResponseRes<ResponseResChangePasswd>() {
+                Data = null,
+                Msg = login.Msg,
+                Response = login.Response
+            };
+        }
 
-        if (!UpdatePassword(Sha3.GetSha3Utf8(newPasswd))) return ThrowErr("UpdatePassword Error");
+        if (string.IsNullOrEmpty(body.NewPasswd))
+            return ThrowMsg("newPasswd Is Empty Or Null");
+        
+        if (!UpdatePassword(Sha3.GetSha3Utf8(body.NewPasswd))) 
+            return ThrowMsg("UpdatePassword Error");
 
-        return true;
+        return ResponseRes<ResponseResChangePasswd>.FactoryRight(new ResponseResChangePasswd() {
+            PasswordRight = true,
+            UsernameRight = true
+        });
     }
 
+
+    public class ResponseResLog : ResponseResLoginData {
+        public class IpLog {
+            public long DateTime { get; set; }
+            public string? Ip { get; set; }
+        }
+        public IpLog[] Ips { get; set; }
+    }
+
+    public class PostLogsBody {
+        public string? Username { get; set; }
+        public string? Passwd { get; set; }
+    }
+
+    [HttpPost("postlogs")]
+    public ResponseRes<ResponseResLog> PostLogs(PostLogsBody body) {
+        static ResponseRes<ResponseResLog> Get500() => new() {
+            Data = null,
+            Msg = "Internal Server Error",
+            Response = StatusCodes.Status500InternalServerError
+        };
+        
+        var login = Login(
+            new LoginBody() { Passwd = body.Passwd, Username = body.Username });
+
+        static ResponseRes<ResponseResLog> ThrowMsg(string msg) {
+#if DEBUG
+            throw new Exception(msg);
+#else
+            return new ResponseRes<ResponseResLog>() {
+                Data = null,
+                Msg = msg,
+                Response = 500
+            };
+#endif
+        }
+
+        var mongo = GetCol.GetLog(StaticConf.DbUrl);
+        if (mongo is null) return Get500();
+
+        List<ResponseResLog.IpLog> res = mongo.FindSync(Builders<Log>.Filter.Empty, 
+            new FindOptions<Log>() {Limit = 200, Sort = Builders<Log>.Sort.Ascending(x => x.DateTime)})
+            .ToEnumerable().Select(log => 
+                new ResponseResLog.IpLog() {
+                    Ip = log.IP,
+                    DateTime = (long)log.DateTime.Subtract(new DateTime(1970,1,1,0,0,0,DateTimeKind.Utc))
+                        .TotalMilliseconds
+                }).ToList();
+
+
+        return new ResponseRes<ResponseResLog>() {
+            Response = StatusCodes.Status200OK,
+            Msg = "",
+            Data = new ResponseResLog() {
+                PasswordRight = true,
+                UsernameRight = true,
+                Ips = res.ToArray() // (from i in logs select (i.DateTime.Ticks,i.IP)).ToArray()
+            }
+        };
+    }
+    
+    
     private static bool UpdatePassword(string passwordHash) {
         var db = GetCol.GetAcc(StaticConf.DbUrl);
         if (db is null) return ThrowErr("db not found");
