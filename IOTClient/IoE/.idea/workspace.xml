@@ -13,9 +13,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2f3f688e-e93d-4c96-945e-c96992aab24c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../BackendApi/BackendApi/Controllers/ConLogin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../BackendApi/BackendApi/Controllers/ConLogin.cs" afterDir="false" />
-    </list>
+    <list default="true" id="2f3f688e-e93d-4c96-945e-c96992aab24c" name="Changes" comment="_" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,23 +38,24 @@
       </list>
     </option>
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:d1_mini" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/weather_client.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/include/TinyBME280.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/console.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Adafruit Unified Sensor/Adafruit_Sensor.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Adafruit Unified Sensor/Adafruit_Sensor.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/README" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Adafruit BMP280 Library/Adafruit_BMP280.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Tiny BME280/lib/TinyBME280Impl.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tuple.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/include/README" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/weather.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Adafruit BMP280 Library/Adafruit_BMP280.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Tiny BME280/lib/TinyBME280Impl.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/README" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Adafruit Unified Sensor/Adafruit_Sensor.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.pio/libdeps/d1_mini/Adafruit Unified Sensor/Adafruit_Sensor.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/weather_client.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/console.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/platformio.ini" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="nh6zp1vt" />
@@ -79,13 +78,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="cmake.loaded.for.project" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="pyconsole" />
+    <property name="settings.editor.selected.configurable" value="clion.platformio.config" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -147,12 +147,49 @@
       <workItem from="1644187352682" duration="96000" />
       <workItem from="1644187450052" duration="91000" />
       <workItem from="1644187562116" duration="35000" />
-      <workItem from="1644189576755" duration="2000" />
+      <workItem from="1644189576755" duration="970000" />
     </task>
+    <task id="LOCAL-00001" summary="_">
+      <created>1644189612797</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1644189612797</updated>
+    </task>
+    <task id="LOCAL-00002" summary="_">
+      <created>1644189808345</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1644189808345</updated>
+    </task>
+    <task id="LOCAL-00003" summary="_">
+      <created>1644189839990</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1644189839990</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="_" />
+    <option name="LAST_COMMIT_MESSAGE" value="_" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
