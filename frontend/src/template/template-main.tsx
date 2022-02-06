@@ -204,7 +204,12 @@ export class TSMain extends React.Component<IPropsTSMain, IStateTSMain> {
                             })}
                             {(() => {
                                 if (!this.manuel) return(
-                                    <div style={{position: "relative", minWidth: 300, minHeight: 50, marginTop: -40, opacity: 0.7}}
+                                    <div style={{
+                                        minWidth: 300,
+                                        minHeight: 50,
+                                        marginTop: -40,
+                                        opacity: 0.7,
+                                    }}
                                          className="CSSBase-ColorBgMidDark">
                                     </div>
                                 )

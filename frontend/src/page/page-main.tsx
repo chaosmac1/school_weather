@@ -2,6 +2,7 @@ import React from "react";
 import {TSMain} from "../template/template-main";
 import {IHistory} from "../i-history";
 import {IMatch} from "../i-match";
+import {TsRoot} from "../template/template-root";
 
 export interface IPropsPageMain {
     history: IHistory,
@@ -16,6 +17,11 @@ export class PageMain extends React.Component<IPropsPageMain, IStatePageMain> {
     }
 
     render() {
-        return ( <TSMain history={this.props.history} />);
+        return (
+            <div>
+                <TsRoot/>
+                <TSMain history={this.props.history} />
+            </div>
+        );
     }
 }

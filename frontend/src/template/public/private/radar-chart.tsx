@@ -19,7 +19,7 @@ export class SIRadarChart extends React.Component<IPropsSIRadarChart, IStateSIRa
 
     private arrayMax(radios: IRadios[]): number {
         if (radios.length === 0) return 0;
-        var count = radios[0].value;
+        let count = radios[0].value;
         for (let i = 1; i < radios.length; i++) {
             if (count < radios[i].value) count = radios[i].value;
         }

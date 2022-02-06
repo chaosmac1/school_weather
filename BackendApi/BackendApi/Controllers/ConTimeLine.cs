@@ -9,11 +9,15 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace BackendApi.Controllers {
     [ApiController]
     [Route("[controller]")]
-    public class ConTimeLine {
+    public class ConTimeLine : ControllerBase {
         public class ETimeStamp: Ulitis.FlexEnum<string, ETimeStamp> {
             public static ETimeStamp FiveSek { get; } = new(0, "fiveSek");
             public static ETimeStamp OneMin { get; } = new(1, "oneMin");
@@ -21,14 +25,16 @@ namespace BackendApi.Controllers {
             public static ETimeStamp OneDay { get; } = new(2, "oneDay");
             
             public ETimeStamp(uint id, string value) : base(id, value) { }
-        } 
-        
+        }
+
         private readonly ILogger<ConTimeLine> _logger;
 
         public ConTimeLine(ILogger<ConTimeLine> logger) => _logger = logger;
         
         [HttpGet("all")]
         public ConTimeLineObj.TsTimeLineAll GetAll(string? startTime, string? endTime, string? timeValue, int timezoneOffset) {
+            InsertLogInDb(GetUserIp());
+            
             if (string.IsNullOrEmpty(startTime)) return new ConTimeLineObj.TsTimeLineAll();
             if (string.IsNullOrEmpty(endTime)) return new ConTimeLineObj.TsTimeLineAll();
             if (string.IsNullOrEmpty(timeValue)) return new ConTimeLineObj.TsTimeLineAll();
@@ -56,6 +62,8 @@ namespace BackendApi.Controllers {
 
         [HttpGet("temp")]
         public ConTimeLineObj.TsTimeLine GetTemp(string? startTime, string? endTime, string? timeValue, int timezoneOffset) {
+            InsertLogInDb(GetUserIp());
+            
             if (string.IsNullOrEmpty(startTime)) return new();
             if (string.IsNullOrEmpty(endTime)) return new();
             if (string.IsNullOrEmpty(timeValue)) return new();
@@ -76,6 +84,8 @@ namespace BackendApi.Controllers {
         
         [HttpGet("windspeed")]
         public ConTimeLineObj.TsTimeLine GetWindSpeed(string? startTime, string? endTime, string? timeValue, int timezoneOffset) {
+            InsertLogInDb(GetUserIp());
+            
             if (string.IsNullOrEmpty(startTime)) return new();
             if (string.IsNullOrEmpty(endTime)) return new();
             if (string.IsNullOrEmpty(timeValue)) return new();
@@ -96,6 +106,8 @@ namespace BackendApi.Controllers {
         
         [HttpGet("humidity")]
         public ConTimeLineObj.TsTimeLine GetHumidity(string? startTime, string? endTime, string timeValue, int timezoneOffset) {
+            InsertLogInDb(GetUserIp());
+            
             if (string.IsNullOrEmpty(startTime)) return new();
             if (string.IsNullOrEmpty(endTime)) return new();
             if (string.IsNullOrEmpty(timeValue)) return new();
@@ -116,6 +128,8 @@ namespace BackendApi.Controllers {
         
         [HttpGet("windDirection")]
         public ConTimeLineObj.TsTimeLine GetWindDirection(string? startTime, string? endTime, string? timeValue, int timezoneOffset) {
+            InsertLogInDb(GetUserIp());
+            
             if (string.IsNullOrEmpty(startTime)) return new();
             if (string.IsNullOrEmpty(endTime)) return new();
             if (string.IsNullOrEmpty(timeValue)) return new();
@@ -135,6 +149,42 @@ namespace BackendApi.Controllers {
         }
 
 
+        public IPAddress GetUserIp() {
+            IPAddress ip;
+            var headers = Request.Headers.ToList();
+            if (headers.Exists((kvp) => kvp.Key == "X-Forwarded-For"))
+            {
+                // when running behind a load balancer you can expect this header
+                var header = headers.First((kvp) => kvp.Key == "X-Forwarded-For").Value.ToString();
+                // in case the IP contains a port, remove ':' and everything after
+                ip = IPAddress.Parse(header.Remove(header.IndexOf(':')));
+            }
+            else
+            {
+                // this will always have a value (running locally in development won't have the header)
+                ip = Request.HttpContext.Connection.RemoteIpAddress?? IPAddress.None;
+            }
+
+            return ip;
+        }
+        
+        private void InsertLogInDb(IPAddress ipAddress) {
+            try {
+                GetCol.GetLog(StaticConf.DbUrl)?.InsertOne(new Log {
+                    DateTime = DateTime.UtcNow,
+                    IP = ipAddress.ToString()
+                });
+            }
+#if DEBUG
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;
+            }
+#else
+            catch (Exception) {  }
+#endif
+        }
+        
         private bool GetTimeLineFromServer(TimeSpan startTime, TimeSpan endTime, ETimeStamp timeValue, out List<TimeLineDb> res) {
             List<TimeLineDb>? fromDb = null;
             if (timeValue == ETimeStamp.FiveSek)

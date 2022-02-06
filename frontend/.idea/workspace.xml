@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="114b03ae-874d-48ad-96f3-8df5ec849eb7" name="Changes" comment="frontend start write settings">
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLine.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLineObjcs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../BackendApi/BackendApi/Controllers/ConTimeLineObjcs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rev-send/get-time-line.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rev-send/get-time-line.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/private/single-set-time.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/private/single-set-time.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/public/private/time-line.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/public/private/time-line.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/public/single-time-lines.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/template-main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/template-main.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="114b03ae-874d-48ad-96f3-8df5ec849eb7" name="Changes" comment="frontend start write settings" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,8 +10,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="CSS File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -49,19 +41,28 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="TODO_SCOPE" value="All Places" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/public" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="ReaderModeSettings">
+    <option name="showLigatures" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public" />
       <recent name="$PROJECT_DIR$/src/single" />
       <recent name="$PROJECT_DIR$/src/template/private" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/template" />
+      <recent name="$PROJECT_DIR$/src/template/public" />
     </key>
   </component>
   <component name="RunManager" selected="npm.npm start">
@@ -102,6 +103,11 @@
       <workItem from="1638518944732" duration="1953000" />
       <workItem from="1638558648568" duration="3011000" />
       <workItem from="1638712073838" duration="22361000" />
+      <workItem from="1643218980077" duration="15532000" />
+      <workItem from="1643393719069" duration="19184000" />
+      <workItem from="1643554921989" duration="12439000" />
+      <workItem from="1644005228727" duration="4449000" />
+      <workItem from="1644187071825" duration="244000" />
     </task>
     <task id="LOCAL-00001" summary="start write on frontend">
       <created>1631404066913</created>
@@ -138,5 +144,9 @@
     <MESSAGE value="start write on frontend" />
     <MESSAGE value="frontend start write settings" />
     <option name="LAST_COMMIT_MESSAGE" value="frontend start write settings" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

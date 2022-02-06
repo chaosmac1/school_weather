@@ -1,9 +1,10 @@
 using BackendApi.DataBase.Type;
 using BackendApi.ExtensionMethod;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BackendApi.Controllers; 
 
-public class ConTimeLineObj {
+public class ConTimeLineObj: ControllerBase {
     public class TsChart {
         private Radio[]? _radios = null;
 

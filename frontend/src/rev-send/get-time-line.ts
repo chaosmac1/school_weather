@@ -1,3 +1,6 @@
+import "./fetchNull";
+import fetchNull, { fetchNullJson }from "./fetchNull";
+
 export interface IPoint {
     pointId: number;
     value: number;
@@ -24,10 +27,7 @@ export interface ITimeLineAll {
 
 export async function getTimeLineAll(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<ITimeLineAll> {
     const sendString = "https://localhost:5002/ConTimeLine/all" + setParas(props);
-
-    console.log("brrr", sendString)
-
-    let res: ITimeLineAll | null | undefined =  await (await fetch(sendString)).json();
+    const res = await fetchNullJson<ITimeLineAll>(sendString);
 
     if (res === null || res === undefined) {
         return {
@@ -43,25 +43,27 @@ export async function getTimeLineAll(props: {startTime: Date, endTime: Date, tim
 
 export async function getTemp(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<ITimeLine> {
     const sendString = "https://localhost:5002/ConTimeLine/temp"  + setParas(props);
-    let res: ITimeLine | null | undefined = await (await fetch(sendString)).json();
 
-    if (res === null || res === undefined) return { points: [] };
+    const res = await fetchNullJson<ITimeLine>(sendString);
+
+    if (res === null) return { points: [] };
 
     return res;
 }
 
 export async function getWindSpeed(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<ITimeLine> {
     const sendString = "https://localhost:5002/ConTimeLine/windspeed" + setParas(props);
-    let res: ITimeLine | null | undefined = await (await fetch(sendString)).json();
 
-    if (res === null || res === undefined) return { points: [] };
+    const res = await fetchNullJson<ITimeLine>(sendString);
+
+    if (res === null) return { points: [] };
 
     return res;
 }
 
 export async function getWind(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<IRadarChart> {
     const sendString = "https://localhost:5002/ConTimeLine/windDirection" + setParas(props);
-    let res: IRadarChart | null | undefined = await (await  fetch(sendString)).json();
+    const res = await fetchNullJson<IRadarChart>(sendString);
 
     if (res === null || res === undefined) return { radios: [] };
 
@@ -70,9 +72,9 @@ export async function getWind(props: {startTime: Date, endTime: Date, timeValue:
 
 export async function getHumidity(props: {startTime: Date, endTime: Date, timeValue: string, timezoneOffset: number}): Promise<ITimeLine> {
     const sendString = "https://localhost:5002/ConTimeLine/humidity" + setParas(props);
-    let res: ITimeLine | null | undefined = await (await  fetch(sendString)).json();
+    const res = await fetchNullJson<ITimeLine>(sendString);
 
-    if (res === null || res === undefined) return { points: [] };
+    if (res === null) return { points: [] };
 
     return res;
 }

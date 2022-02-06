@@ -1,0 +1,129 @@
+.ts-root {
+    color: white;
+    width: 100vw;
+    background-color: red;
+}
+
+.ts-root-login-field-div {
+    position: fixed;
+    z-index: 10000;
+    display: grid;
+    height: 100vh;
+    width: 100vw;
+    justify-items: center;
+}
+
+.ts-root-login-field {
+    color: white;
+    place-self: center;
+    /*width: clamp(300px, 300px, 300px);*/
+    width: max(15vw, 400px);
+    height: max(50vh, 600px);
+    border-radius: 35px;
+    background-color: var(--color-bg-lite-dark);
+}
+
+.ts-root-login-field-input-Text-input {
+    background-color: #000000;
+    border-color: transparent;
+    border-radius: 10px;
+    margin: max(1vh, 10px);
+    margin-right: max(1vw, 5px);
+    margin-left: max(1vw, 5px);
+    color: white;
+    padding: max(5px, .2vh);
+    padding-left: max(15px, .2vw);
+    padding-right: max(15px, .2vw);
+    width: 75%;
+    height: max(20px, 1.7vh);
+    display: flex;
+}
+
+.ts-root-login-field-input-Text-Text {
+    font-weight: 600;
+    font-size: var(--text-light-big);
+}
+
+.ts-root-login-field-login-button-div {
+    margin-top: max(40px, 3.6vh);
+    padding-right: max(15px, .2vw);
+    margin-right: max(1vw, 5px);
+    margin-left: max(1vw, 5px);
+    width: 85%;
+}
+
+.ts-root-login-field-login-button {
+    color: white;
+    padding: max(15px, .8vw);
+    padding-left: max(30px, 1.6vw);
+    padding-right: max(30px, 1.6vw);
+    border-radius: max(15px, .8vw);
+    border-color: transparent;
+    background-color: var(--color-bg-dark2);
+    font-size: calc(var(--text-light-big) + max(.1vw, 2px));
+    transition: all 250ms ease;
+}
+
+.ts-root-login-field-login-button:hover {
+    box-shadow: inset 0 0 0 max(2px, 0.1vw) var(--color-bg-high-light);
+}
+
+@keyframes animation-button-error-swiggle {
+    0% { transform: translate(0px,0px); }
+    15% { transform: translate(20px,0px); }
+    35% { transform: translate(-20px,0px); }
+    55% { transform: translate(20px,0px); }
+    80% { transform: translate(-20px,0px); }
+    100% { transform: translate(0px,0px); }
+}
+
+
+.ts-root-log-field-div {
+    position: fixed;
+    z-index: 1000000;
+    display: grid;
+    height: 100vh;
+    width: 100vw;
+    justify-items: center;
+}
+
+.ts-root-log-field {
+    color: white;
+    place-self: center;
+    width: max(40vw, 400px);
+    height: max(80vh, 600px);
+    border-radius: max(2vw, 35px);
+    background-color: var(--color-bg-lite-dark);
+}
+
+.ts-root-log-button-x {
+    position: relative;
+    width: max(40px, 4vh);
+    margin-top: min(-30px, -3vh);
+    margin-right: max(20px, 1vw);
+}
+
+.ts-root-log-row {
+    text-align: center;
+    font-size: var(--text-light-big);
+    margin: max(6px, 0.6vh);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -48,13 +48,19 @@ public class IotServer {
         const string ok = "{error: false}";
         const string error = "{error: true}";
 
+        static string FixJsonRev(string jsonValue) {
+            var posi = jsonValue.IndexOf("}{", StringComparison.Ordinal);
+            return posi == -1 ? jsonValue : jsonValue.Remove(posi +1);
+        } 
+        
         while (client.Active()) {
             if (!client.ReceiveString(out var json)) {
                 _pushStream.Push(null);
                 ThrowError("client.ReceiveString()");
             }
-                
-            var iotTimeData = ReceiveIotValue.Factory(json!);
+
+            json = FixJsonRev(json!);
+            var iotTimeData = ReceiveIotValue.Factory(json);
 
             if (iotTimeData is null) {
                 SendErrCloseOrThrowInDebug(client, error, "iotTimeData Is Null");

@@ -1,4 +1,5 @@
 using BackendApi.DataBase.Type;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -17,6 +18,7 @@ public static class GetCol {
         if (type == CollationTypeOf.TTimeLine1Min) return (IMongoCollection<T>?)GetTimeLine1min(url);
         if (type == CollationTypeOf.TTimeLine1H) return (IMongoCollection<T>?)GetTimeLine1h(url);
         if (type == CollationTypeOf.TTimeLine1Day) return (IMongoCollection<T>?)GetTimeLine1day(url);
+        
         return null;
     }
 
@@ -62,6 +64,22 @@ public static class GetCol {
 #endif
     }
 
+    public static IMongoCollection<Log>? GetLog(string url) {
+        try {
+            var client = GetMongoClient(url);
+            var coll = client.GetDatabase(DataBaseName.TimeLine).GetCollection<Log>(CollationName.Log);
+            return coll;
+        }
+#if DEBUG
+        catch (Exception e) {
+            Console.WriteLine(e);
+            throw;
+        }
+#else
+            catch (Exception) { return null; }
+#endif
+    }
+    
     public static IMongoCollection<TimeLine1Day>? GetTimeLine1day(string url) {
         try {
             var client = GetMongoClient(url);
@@ -120,6 +138,7 @@ public static class GetCol {
         public const string TimeLine1day = "time_line_1day";
         public const string TimeLine1H = "time_line_1h";
         public const string Acc = "acc";
+        public const string Log = "log";
     }
 
     private static class CollationTypeOf {
@@ -127,5 +146,6 @@ public static class GetCol {
         public static readonly System.Type TTimeLine1Min = typeof(TimeLine1Min);
         public static readonly System.Type TTimeLine1Day = typeof(TimeLine1Day);
         public static readonly System.Type TTimeLine1H = typeof(TimeLine1H);
+        public static readonly System.Type TLog = typeof(Log);
     }
 }

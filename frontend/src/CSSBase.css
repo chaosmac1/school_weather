@@ -1,24 +1,42 @@
+:root {
+    --text-big: max(1.4vw, 20px);
+    --text-light-big: max(.8vw, 16px);
+    --color-bg-dark: #0B0C10;
+    --color-bg-dark2: #090a0e;
+    --color-bg-mid-dark: #13181f;
+    --color-bg-lite-dark: #1F2833;
+    --color-bg-high-light: #45a29e;
+}
+
+.CSSBase-TextBig {
+    font-size: var(--text-big);
+}
+
+.CSSBase-TextLightBig {
+    font-size: var(--text-light-big);
+}
+
 /* region Color */
-.CSSBase-ColorBgDark { background-color: #0B0C10; }
+.CSSBase-ColorBgDark { background-color: var(--color-bg-dark); }
 
-.CSSBase-ColorBgDark2 { background-color: #090a0e; }
+.CSSBase-ColorBgDark2 { background-color: var(--color-bg-dark2); }
 
-.CSSBase-ColorBgMidDark { background-color: #13181f; }
+.CSSBase-ColorBgMidDark { background-color: var(--color-bg-mid-dark); }
 
-.CSSBase-ColorBgLiteDark { background-color: #1F2833; }
+.CSSBase-ColorBgLiteDark { background-color: var(--color-bg-lite-dark); }
 
-.CSSBase-ColorBgHighlight { background-color: #45a29e; }
+.CSSBase-ColorBgHighlight { background-color: var(--color-bg-high-light); }
 
 
-.CSSBase-ColorDark { color: #0B0C10; }
+.CSSBase-ColorDark { color: var(--color-bg-dark); }
 
-.CSSBase-ColorDark2 { color: #090a0e; }
+.CSSBase-ColorDark2 { color: var(--color-bg-dark2); }
 
-.CSSBase-ColorMidDark { color: #13181f; }
+.CSSBase-ColorMidDark { color: var(--color-bg-mid-dark); }
 
-.CSSBase-ColorLiteDark { color: #1F2833; }
+.CSSBase-ColorLiteDark { color: var(--color-bg-lite-dark); }
 
-.CSSBase-ColorHighlight {color: #45a29e; }
+.CSSBase-ColorHighlight { color: var(--color-bg-high-light); }
 /* endregion */
 
 .CSSBase-MidMargin {
